@@ -4,6 +4,7 @@
 
 codegen_tree::codegen_tree()
 {
+    nodes.append({CODE_VOID});
 }
 
 int param_len(int type)
@@ -13,6 +14,8 @@ int param_len(int type)
     case CODE_RETURN:
     case CODE_PRINT:
     case CODE_CALL:
+    case CODE_ENTRY:
+    case CODE_NEG:
         return 1;
     case CODE_ASIG:
     case CODE_FUNCTION:
@@ -20,6 +23,9 @@ int param_len(int type)
     case CODE_IF:
     case CODE_BLOCK:
     case CODE_LOOP:
+    case CODE_DECLLIST:
+    case CODE_VARLIST:
+    case CODE_PROGRAM:
         return 2;
     case CODE_IF_ELSE:
     case CODE_COND:
@@ -31,6 +37,9 @@ int param_len(int type)
 
 int codegen_tree::node(int type,...)
 {
+    // void optimization
+    if(type == CODE_VOID) return 0;
+
     va_list ap;
     va_start(ap, type);
     node_t n;
@@ -86,7 +95,18 @@ QString name(int t)
         return QString("call");
     case CODE_DECL:
         return QString("decl");
+    case CODE_ENTRY:
+        return QString("entry");
+    case CODE_DECLLIST:
+        return QString("declList");
+    case CODE_NEG:
+        return QString("neg");
+    case CODE_VARLIST:
+        return QString("varList");
+    case CODE_PROGRAM:
+        return("Program");
     }
+    return QString("");
 }
 
 #include <QDebug>

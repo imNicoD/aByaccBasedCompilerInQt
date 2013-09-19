@@ -3,11 +3,11 @@
 
 %%
 
-program		: listdecl bloqsent
+program		: listdecl bloqsent							{$$ = cod->node(CODE_PROGRAM, $1,$2);}
 			;
 
-listdecl	: decl ';' listdecl
-			|
+listdecl	: decl ';' listdecl							{ $$ = cod->node(CODE_DECLLIST, $1,$2);}
+			|											{ $$ = cod->node(CODE_VOID);}
 			;
 			
 decl		: declvar
@@ -20,28 +20,28 @@ declvar		: TYPE listvar								{ $$ = cod->node(CODE_DECL, $1, $2);}
 			| error		  							 	{ notify("Se esperaba declaración.");}
 			;
 
-listdeclvar	: declvar ';' listdeclvar
-			|
+listdeclvar	: declvar ';' listdeclvar					{ $$ = cod->node(CODE_DECLLIST, $1,$2);}
+			|											{ $$ = cod->node(CODE_VOID);}
 			;
 
-funcsentlist: funcsent funcsentlist
-			|
+funcsentlist: funcsent funcsentlist						{}
+			|											{ $$ = cod->node(CODE_VOID);}
 			;
 
 funcsent 	: sentencia  ';' 							{ $$ = $1; }
-			| ID ':'									{ $$ = cod->node(CODE_VOID);}
+			| ID ':'									{ $$ = cod->node(CODE_ENTRY, $1);}
 			;	
 
 
-listvar		: ID 										{}
-			| ID ',' listvar							{}
+listvar		: ID 										{ $$ = $1}
+			| ID ',' listvar							{ $$ = cod->node(CODE_VARLIST, $1, $3);}
 			;
 
 bloqsent	: BEGIN listsent END						{ $$ = $1; }
 			| sentencia									{ $$ = $1; }
 			;
 
-listsent	: sentencia ';' listsent					{ $$ = cod->node(CODE_BLOCK, $1, $2); }
+listsent	: sentencia ';' listsent					{ $$ = cod->node(CODE_BLOCK, $1, $3); }
 			|											{ $$ = cod->node(CODE_VOID);}
 			;
 			
@@ -52,12 +52,12 @@ sentencia 	: if										{ $$ = $1;}
 			| PRINT '(' STR ')'							{ $$ = cod->node(CODE_PRINT, $1);}
 			| ID '=' expr								{ $$ = cod->node(CODE_ASIG, $1, $2);}
 			| ID error									{ $$ = cod->node(CODE_VOID); notify("Se esperaba '='.");	}
-			| RETURN error
-			| PRINT error
+			| RETURN error								{$$ = cod->node(CODE_VOID); notify("se esperaba '('");}
+			| PRINT error								{$$ = cod->node(CODE_VOID); notify("se esperaba '('");}
 			|
 			;
 
-if			: IF pcond THEN bloqsent					{$$ = cod->node(CODE_IF, $1, $2);}
+if			: IF pcond THEN bloqsent					{$$ = cod->node(CODE_IF, $2, $4);}
 			| IF pcond THEN bloqsent ELSE bloqsent		{$$ = cod->node(CODE_IF_ELSE, $1, $2, $3);}
 			| IF pcond error							{$$ = cod->node(CODE_VOID); notify("se esperaba THEN");}
 			;
@@ -73,14 +73,14 @@ term 		: fact								{ $$ = $1; }
 			|  term '/' fact					{ $$ = cod->node(CODE_EXPR, $1, '/', $3);}					
 			;
 		
-fact		: ID								{$$ = cod->node(CODE_VOID);}
-			| CONST								{$$ = cod->node(CODE_VOID);}
-			| '-' CONST							
+fact		: ID								{$$ = -1;}
+			| CONST								{$$ = -1;}
+			| '-' CONST							{$$ = cod->node(CODE_NEG, $2);}
 			| ID '(' ')'						{$$ = cod->node(CODE_CALL, $1);}
 			| ID '(' error						{$$ = cod->node(CODE_VOID); notify("se esperaba ')'");} 
 			;
 
-pcond		: '(' cond ')'						{$$ = $1; }
+pcond		: '(' cond ')'						{$$ = $2; }
 			| '(' cond error					{ $$ = cod->node(CODE_VOID); notify("Se esperaba ')'");}
 			| '(' error							{ $$ = cod->node(CODE_VOID); notify("Se esperaba condición.");}
 			| error								{ $$ = cod->node(CODE_VOID); notify("Se esperaba '('");}

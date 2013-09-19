@@ -14,6 +14,11 @@
 #define CODE_FUNCTION   10
 #define CODE_CALL       11
 #define CODE_DECL       12
+#define CODE_ENTRY      13
+#define CODE_DECLLIST   14
+#define CODE_NEG        15
+#define CODE_VARLIST    16
+#define CODE_PROGRAM    17
 
 
 class codegen_base

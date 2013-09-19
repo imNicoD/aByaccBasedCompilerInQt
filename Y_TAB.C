@@ -429,7 +429,7 @@ case 14:
 break;
 case 15:
 #line 32 "bnf.y"
-{ yyval = cod->node(CODE_VOID);}
+{ yyval = cod->node(CODE_ENTRY, yyvsp[-1]);}
 break;
 case 16:
 #line 36 "bnf.y"
@@ -449,7 +449,7 @@ case 19:
 break;
 case 20:
 #line 44 "bnf.y"
-{ yyval = cod->node(CODE_BLOCK, yyvsp[-2], yyvsp[-1]); }
+{ yyval = cod->node(CODE_BLOCK, yyvsp[-2], yyvsp[0]); }
 break;
 case 21:
 #line 45 "bnf.y"
@@ -485,7 +485,7 @@ case 28:
 break;
 case 32:
 #line 60 "bnf.y"
-{yyval = cod->node(CODE_IF, yyvsp[-3], yyvsp[-2]);}
+{yyval = cod->node(CODE_IF, yyvsp[-2], yyvsp[0]);}
 break;
 case 33:
 #line 61 "bnf.y"
@@ -537,7 +537,7 @@ case 45:
 break;
 case 46:
 #line 83 "bnf.y"
-{yyval = yyvsp[-2]; }
+{yyval = yyvsp[-1]; }
 break;
 case 47:
 #line 84 "bnf.y"
