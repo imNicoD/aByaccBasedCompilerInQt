@@ -403,6 +403,18 @@ yyreduce:
     yyval = yyvsp[1-yym];
     switch (yyn)
     {
+case 1:
+#line 6 "bnf.y"
+{yyval = cod->node(CODE_PROGRAM, yyvsp[-1],yyvsp[0]);}
+break;
+case 2:
+#line 9 "bnf.y"
+{ yyval = cod->node(CODE_DECLLIST, yyvsp[-2],yyvsp[-1]);}
+break;
+case 3:
+#line 10 "bnf.y"
+{ yyval = cod->node(CODE_VOID);}
+break;
 case 5:
 #line 14 "bnf.y"
 { yyval = cod->node(CODE_FUNCTION, yyvsp[-4], yyvsp[-3]); }
@@ -423,6 +435,22 @@ case 9:
 #line 20 "bnf.y"
 { notify("Se esperaba declaración.");}
 break;
+case 10:
+#line 23 "bnf.y"
+{ yyval = cod->node(CODE_DECLLIST, yyvsp[-2],yyvsp[-1]);}
+break;
+case 11:
+#line 24 "bnf.y"
+{ yyval = cod->node(CODE_VOID);}
+break;
+case 12:
+#line 27 "bnf.y"
+{}
+break;
+case 13:
+#line 28 "bnf.y"
+{ yyval = cod->node(CODE_VOID);}
+break;
 case 14:
 #line 31 "bnf.y"
 { yyval = yyvsp[-1]; }
@@ -433,11 +461,11 @@ case 15:
 break;
 case 16:
 #line 36 "bnf.y"
-{}
+{ yyval = yyvsp[0]; }
 break;
 case 17:
 #line 37 "bnf.y"
-{}
+{ yyval = cod->node(CODE_VARLIST, yyvsp[-2], yyvsp[0]);}
 break;
 case 18:
 #line 40 "bnf.y"
@@ -461,7 +489,7 @@ case 22:
 break;
 case 23:
 #line 49 "bnf.y"
-{ yyval = cod->node(CODE_LOOP, yyvsp[-3] ,yyvsp[-2] );}
+{ yyval = cod->node(CODE_LOOP, yyvsp[-2] ,yyvsp[0] );}
 break;
 case 24:
 #line 50 "bnf.y"
@@ -469,19 +497,27 @@ case 24:
 break;
 case 25:
 #line 51 "bnf.y"
-{ yyval = cod->node(CODE_RETURN, yyvsp[-3]);}
+{ yyval = cod->node(CODE_RETURN, yyvsp[-1]);}
 break;
 case 26:
 #line 52 "bnf.y"
-{ yyval = cod->node(CODE_PRINT, yyvsp[-3]);}
+{ yyval = cod->node(CODE_PRINT, yyvsp[-1]);}
 break;
 case 27:
 #line 53 "bnf.y"
-{ yyval = cod->node(CODE_ASIG, yyvsp[-2], yyvsp[-1]);}
+{ yyval = cod->node(CODE_ASIG, yyvsp[-2], yyvsp[0]);}
 break;
 case 28:
 #line 54 "bnf.y"
 { yyval = cod->node(CODE_VOID); notify("Se esperaba '='.");	}
+break;
+case 29:
+#line 55 "bnf.y"
+{yyval = cod->node(CODE_VOID); notify("se esperaba '('");}
+break;
+case 30:
+#line 56 "bnf.y"
+{yyval = cod->node(CODE_VOID); notify("se esperaba '('");}
 break;
 case 32:
 #line 60 "bnf.y"
@@ -521,11 +557,15 @@ case 40:
 break;
 case 41:
 #line 76 "bnf.y"
-{yyval = cod->node(CODE_VOID);}
+{yyval = -1;}
 break;
 case 42:
 #line 77 "bnf.y"
-{yyval = cod->node(CODE_VOID);}
+{yyval = -1;}
+break;
+case 43:
+#line 78 "bnf.y"
+{yyval = cod->node(CODE_NEG, yyvsp[0]);}
 break;
 case 44:
 #line 79 "bnf.y"
@@ -583,7 +623,7 @@ case 57:
 #line 99 "bnf.y"
 {yyval =  EQU;}
 break;
-#line 587 "y_tab.c"
+#line 627 "y_tab.c"
     }
     yyssp -= yym;
     yystate = *yyssp;

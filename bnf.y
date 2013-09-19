@@ -33,7 +33,7 @@ funcsent 	: sentencia  ';' 							{ $$ = $1; }
 			;	
 
 
-listvar		: ID 										{ $$ = $1}
+listvar		: ID 										{ $$ = $1; }
 			| ID ',' listvar							{ $$ = cod->node(CODE_VARLIST, $1, $3);}
 			;
 
@@ -46,11 +46,11 @@ listsent	: sentencia ';' listsent					{ $$ = cod->node(CODE_BLOCK, $1, $3); }
 			;
 			
 sentencia 	: if										{ $$ = $1;}
-			| LOOP bloqsent UNTIL cond 					{ $$ = cod->node(CODE_LOOP, $1 ,$2 );}
+			| LOOP bloqsent UNTIL cond 					{ $$ = cod->node(CODE_LOOP, $2 ,$4 );}
 			| LOOP bloqsent error						{ $$ = cod->node(CODE_VOID); notify("Se esperaba UNTIL.");}
-			| RETURN '(' expr ')'						{ $$ = cod->node(CODE_RETURN, $1);}
-			| PRINT '(' STR ')'							{ $$ = cod->node(CODE_PRINT, $1);}
-			| ID '=' expr								{ $$ = cod->node(CODE_ASIG, $1, $2);}
+			| RETURN '(' expr ')'						{ $$ = cod->node(CODE_RETURN, $3);}
+			| PRINT '(' STR ')'							{ $$ = cod->node(CODE_PRINT, $3);}
+			| ID '=' expr								{ $$ = cod->node(CODE_ASIG, $1, $3);}
 			| ID error									{ $$ = cod->node(CODE_VOID); notify("Se esperaba '='.");	}
 			| RETURN error								{$$ = cod->node(CODE_VOID); notify("se esperaba '('");}
 			| PRINT error								{$$ = cod->node(CODE_VOID); notify("se esperaba '('");}
