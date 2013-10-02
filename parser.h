@@ -16,6 +16,7 @@ private:
     void yyerror(QString s);
     int yylex();
     void notify(const char * c);
+    int yyval;
     lexer_base  * lex;
     stream_base * err;
     codegen_base* cod;

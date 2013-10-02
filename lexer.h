@@ -60,7 +60,7 @@ public:
     void addReservedWord(QString word, int value);
 
     //Search the next token in the text
-    virtual int yylex(void);
+    virtual token_t yylex(void);
 
     /** HACER UN METODO QUE ENVIE LA TABLA DE SIMBOLOS ASI LA MUESTRA POR PANTALLA EL PROGRAMA **/
     //Show Symbol Table

@@ -258,7 +258,7 @@ int yyerrflag;
 int yychar;
 short *yyssp;
 YYSTYPE *yyvsp;
-YYSTYPE yyval;
+//YYSTYPE yyval;
 YYSTYPE yylval;
 short yyss[YYSTACKSIZE];
 YYSTYPE yyvs[YYSTACKSIZE];

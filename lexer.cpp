@@ -287,13 +287,13 @@ int Lexer::getCharType(QChar c)
         return OTROS;
 }
 
-int Lexer::yylex()
+token_t Lexer::yylex()
 {
     int state   = 0;
     int characterType = 0; //this variable keeps the character type that later we use it to search in the matrix
     actualLexema = "";
     actualChar  = 0;
-    token       = -1;
+    token  = -1;
 
     // Reads the text until found a token or finish de text;
     while ( (state != F) && ( characterType != FINARCHIVO ))
@@ -317,11 +317,11 @@ int Lexer::yylex()
     }
     if(state == F){
         err->putLine(actualLexema + ", token identificado: " + QString::number(token));
-        return token;
+        return {token};
     }
     else{
         //qDebug() << "Lineas recorridas: " << actualLine;
-        return 0;
+        return {0};
     }
 }
 

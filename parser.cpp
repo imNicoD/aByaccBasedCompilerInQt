@@ -21,7 +21,9 @@ void parser::notify(const char *c)
 
 int parser::yylex()
 {
-    return this->lex->yylex();
+    token_t t = this->lex->yylex();
+    yyval = t.val;
+    return t.type;
 }
 
 #define yyparse parser::yyparse
