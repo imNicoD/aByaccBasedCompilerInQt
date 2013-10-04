@@ -48,10 +48,12 @@ const int states[NUM_STATES][NUM_INPUTS] =
       { 7 , 7 , 8 , 7 , 7 , 7 , 7 , 7 , 7 , 7 , F , 7 , 7 , 7 , 7 , 7 , 7 , 7 , 7 ,  7  , F , 7 },    //e8 cadena con posible salto de linea
 };
 
+#include "symboltable.h"
+
 class Lexer : public lexer_base
 {
 public:
-    Lexer(QString text, stream_base * err, QMap<QString, Attribute*>*);
+    Lexer(QString text, stream_base * err, SymbolTable*);
 
     virtual int currentLine(){ return actualLine;}
     virtual int currentCol (){ return actualPos ;}
@@ -60,11 +62,11 @@ public:
     void addReservedWord(QString word, int value);
 
     //Search the next token in the text
-    virtual token_t yylex(void);
+    virtual int yylex(void);
 
     /** HACER UN METODO QUE ENVIE LA TABLA DE SIMBOLOS ASI LA MUESTRA POR PANTALLA EL PROGRAMA **/
     //Show Symbol Table
-    QMap<QString, Attribute*>* getSybolTable();
+    SymbolTable * getSybolTable();
 
 private:
     //Elements for reading the text
@@ -73,7 +75,7 @@ private:
     QString     actualLexema;
     QString     readingInfo;
     QChar        actualChar;
-
+    int         lastEntry;
     int         token;
 
     stream_base * err;
@@ -82,7 +84,7 @@ private:
     int getCharType(QChar c);
 
     QMap<QString, int>* reservedWordTable;
-    QMap<QString, Attribute*>* symbolTable;
+    SymbolTable * symbolTable;
 
     void (Lexer :: * semanticActions[NUM_STATES][NUM_INPUTS])();
 

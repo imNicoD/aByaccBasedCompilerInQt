@@ -9,7 +9,7 @@ class Attribute
 public:
     Attribute();
     QString type;
-    int token;
+    long long value;
     QString lexema;
 };
 

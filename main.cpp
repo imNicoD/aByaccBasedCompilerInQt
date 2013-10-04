@@ -6,13 +6,13 @@
 #include "console.h"
 #include "stream_double.h"
 #include "stream_txt.h"
-
+#include "symboltable.h"
 #include <iostream>
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    if(argc > 1 && argv[1] == "-f")
+    if(argc > 1 && QString(argv[1]) == QString("-f"))
     {
         console csl;
         stream_txt txt(QString(argv[2])+".txt");
@@ -21,8 +21,8 @@ int main(int argc, char *argv[])
         if (file.open(QIODevice::ReadOnly | QIODevice::Text))
         {
             QString s = file.readAll();
-            QMap<QString, Attribute*> symTable;
-            parser p(new Lexer(s, &out, &symTable), &out, new codegen_print(&out));
+            SymbolTable symTable;
+            parser p(new Lexer(s, &out, &symTable), &out, new codegen_print(&out), &symTable);
             int r = p.yyparse();
             for (int i=0; i<symTable.size(); i++)
             {

@@ -60,7 +60,7 @@ private:
     QString currentFile;
     QString text;
     bool modified;
-    QMap<QString, Attribute*> * symTable;
+    SymbolTable * symTable;
     Lexer* lexer;
     QFile result;
 };

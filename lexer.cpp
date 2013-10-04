@@ -1,7 +1,7 @@
 #include "lexer.h"
 #include "Y_TAB.H"
 
-Lexer::Lexer(QString text, stream_base * err, QMap<QString, Attribute*> * symTable)
+Lexer::Lexer(QString text, stream_base * err, SymbolTable * symTable)
 {
     this->err = err;
     readingInfo = text; // copy the text on the screen
@@ -287,7 +287,7 @@ int Lexer::getCharType(QChar c)
         return OTROS;
 }
 
-token_t Lexer::yylex()
+int Lexer::yylex()
 {
     int state   = 0;
     int characterType = 0; //this variable keeps the character type that later we use it to search in the matrix
@@ -317,15 +317,15 @@ token_t Lexer::yylex()
     }
     if(state == F){
         err->putLine(actualLexema + ", token identificado: " + QString::number(token));
-        return {token};
+        return token;
     }
     else{
         //qDebug() << "Lineas recorridas: " << actualLine;
-        return {0};
+        return 0;
     }
 }
 
-QMap<QString, Attribute *> *Lexer::getSybolTable()
+SymbolTable *Lexer::getSybolTable()
 {
     return symbolTable;
 }
@@ -351,6 +351,8 @@ void Lexer::A2()
     actualLexema+=QString(QChar(actualChar));
 }
 
+extern int yylval;
+
 // Verifica palabra reservada o longitud del identidicador, lo incorpora a la tabla de simbolos
 void Lexer::A3()
 {
@@ -371,14 +373,15 @@ void Lexer::A3()
             actualLexema.truncate(15);
             err->putLine("WARNING - El identificador "+lexemaLong+" a sido truncado a "+actualLexema+".");
         }
-        else
-            if ( ! symbolTable->contains (actualLexema ))
-            {
-                Attribute* attrib =new Attribute();
-                attrib->type="Id";
-                symbolTable->insert (actualLexema,attrib);
-            }
+        if ( ! symbolTable->contains (actualLexema ))
+        {
+            Attribute* attrib =new Attribute();
+            attrib->type="Id";
+            attrib->lexema = actualLexema;
+            symbolTable->insert (actualLexema,attrib);
+        }
         token=ID;
+        yylval = symbolTable->getIndex(actualLexema);
     }
 }
 
@@ -399,10 +402,14 @@ void Lexer::A4()
         {
             Attribute* attrib =new Attribute();
             attrib->type="Cte";
+            attrib->lexema = actualLexema;
+            attrib->value = actualLexema.toLongLong(0,10);
             symbolTable->insert (actualLexema,attrib);
         }
         token=CONST;
+        yylval = symbolTable->getIndex(actualLexema);
     }
+
 }
 
 //Verfico y devuelvo el token del operador correspondiente
@@ -467,11 +474,13 @@ void Lexer::A9(){
     {
         Attribute* attrib =new Attribute();
         attrib->type="Str";
+        attrib->lexema = actualLexema;
         actualLexema.remove(0,1);
         actualLexema.remove(actualLexema.size()-1,1);
         symbolTable->insert (actualLexema,attrib);
     }
     token = STR;
+    yylval = symbolTable->getIndex(actualLexema);
 }
 
 //Reconoce fin de cadena, precedido por +
@@ -482,11 +491,13 @@ void Lexer::A10(){
     {
         Attribute* attrib =new Attribute();
         attrib->type="Str";
+        attrib->lexema = actualLexema;
         actualLexema.remove(0,1);
         actualLexema.remove(actualLexema.size()-1,1);
         symbolTable->insert (actualLexema,attrib);
     }
     token = STR;
+    yylval = symbolTable->getIndex(actualLexema);
 }
 
 //Error carácter invalido

@@ -3,7 +3,7 @@
 
 %%
 
-program		: listdecl bloqsent							{$$ = cod->node(CODE_PROGRAM, $1,$2);}
+program		: listdecl listsent							{$$ = cod->node(CODE_PROGRAM, $1,$2);}
 			;
 
 listdecl	: decl ';' listdecl							{ $$ = cod->node(CODE_DECLLIST, $1,$2);}
@@ -73,9 +73,9 @@ term 		: fact								{ $$ = $1; }
 			|  term '/' fact					{ $$ = cod->node(CODE_EXPR, $1, '/', $3);}					
 			;
 		
-fact		: ID								{$$ = -1;}
-			| CONST								{$$ = -1;}
-			| '-' CONST							{$$ = cod->node(CODE_NEG, $2);}
+fact		: ID								{}
+			| CONST								{if(!check_range($$)) notify("Variable fuera de rango");}
+			| '-' CONST							{$$ = negative($2);}
 			| ID '(' ')'						{$$ = cod->node(CODE_CALL, $1);}
 			| ID '(' error						{$$ = cod->node(CODE_VOID); notify("se esperaba ')'");} 
 			;

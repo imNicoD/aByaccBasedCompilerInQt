@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     codegen_print.cpp \
     stream_double.cpp \
     stream_txt.cpp \
-    codegen_tree.cpp
+    codegen_tree.cpp \
+    symboltable.cpp
 
 HEADERS  += mainwindow.h \
     lexer.h \
@@ -38,7 +39,8 @@ HEADERS  += mainwindow.h \
     codegen_print.h \
     stream_double.h \
     stream_txt.h \
-    codegen_tree.h
+    codegen_tree.h \
+    symboltable.h
 
 FORMS    += mainwindow.ui \
     dialog.ui

@@ -5,6 +5,7 @@
 #include <QMap>
 #include"attribute.h"
 #include <QDebug>
+#include "symboltable.h"
 
 namespace Ui {
 class Dialog;
@@ -16,12 +17,12 @@ class Dialog : public QDialog
 
 public:
     explicit Dialog(QWidget *parent = 0);
-    void addSybolTable(QMap<QString, Attribute*>* st);
+    void addSybolTable(SymbolTable* st);
     ~Dialog();
 
 private:
     Ui::Dialog *ui;
-    QMap<QString, Attribute*>* symbolTable;
+    SymbolTable * symbolTable;
 };
 
 #endif // DIALOG_H

@@ -5,21 +5,24 @@
 #include "stream_base.h"
 #include "codegen_base.h"
 #include "Y_TAB.h"
+#include "symboltable.h"
 
 class parser
 {
 public:
-    parser(lexer_base * lex, stream_base * err, codegen_base * cod);
+    parser(lexer_base * lex, stream_base * err, codegen_base * cod, SymbolTable * sym);
     int yyparse();
 
 private:
     void yyerror(QString s);
     int yylex();
     void notify(const char * c);
-    int yyval;
+    bool check_range(int i);
+    int negative(int i);
     lexer_base  * lex;
     stream_base * err;
     codegen_base* cod;
+    SymbolTable * sym;
 };
 
 #endif // PARSER_H

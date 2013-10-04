@@ -8,7 +8,7 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
 }
 
-void Dialog::addSybolTable(QMap<QString, Attribute *> *st)
+void Dialog::addSybolTable(SymbolTable *st)
 {
     symbolTable = st;
     for (int i=0; i<symbolTable->size(); i++)

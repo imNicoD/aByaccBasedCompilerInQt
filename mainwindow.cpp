@@ -156,14 +156,14 @@ void MainWindow::documentWasModified()
 void MainWindow::on_actionBuild_triggered()
 {
     ui->outPutError->setText("");
-    this->symTable = new QMap<QString, Attribute*>();
+    symTable = new SymbolTable();
     lexer = new Lexer(ui->TextEditor->toPlainText(), this, symTable);
 
     //Para la salida a Texto
     stream_txt txt("Result.txt");
     stream_double out(this, &txt);
     codegen_tree tree;
-    parser p1(lexer, &out, &tree);
+    parser p1(lexer, &out, &tree, symTable);
     p1.yyparse();
     for (int i=0; i<symTable->size(); i++)
     {

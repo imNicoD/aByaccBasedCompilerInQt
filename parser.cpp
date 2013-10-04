@@ -1,10 +1,11 @@
 #include "parser.h"
 
-parser::parser(lexer_base * lex, stream_base * err, codegen_base * cod)
+parser::parser(lexer_base * lex, stream_base * err, codegen_base * cod, SymbolTable * sym)
 {
     this->lex = lex;
     this->err = err;
     this->cod = cod;
+    this->sym = sym;
 }
 
 void parser::yyerror(QString s)
@@ -21,9 +22,30 @@ void parser::notify(const char *c)
 
 int parser::yylex()
 {
-    token_t t = this->lex->yylex();
-    yyval = t.val;
-    return t.type;
+    return this->lex->yylex();
+}
+
+bool parser::check_range(int i)
+{
+    Attribute * attr = this->sym->value(i);
+    if(attr->lexema.toLongLong(0,10) < 2147483648)
+        return true;
+    return false;
+}
+#include <QDebug>
+int parser::negative(int i)
+{
+    Attribute * attr = this->sym->value(i);
+    QString vstr = "-"+attr->lexema;
+    qDebug() << attr->lexema;
+    if(sym->contains(vstr))
+        return sym->getIndex(vstr);
+
+    Attribute * nattr = new Attribute();
+    nattr->lexema = vstr;
+    nattr->type = "Cte";
+    sym->insert(vstr, nattr);
+    return sym->getIndex(vstr);
 }
 
 #define yyparse parser::yyparse
