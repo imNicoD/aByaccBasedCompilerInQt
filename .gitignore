@@ -12,6 +12,12 @@
 *.la
 *.a
 
+#QtCreator project files
+*.pro.user
+=======
+*.pro.user*
+*~
+
 # qt stuff
 *.pro.user*
 *.pro.user
