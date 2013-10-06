@@ -24,7 +24,9 @@ SOURCES += main.cpp\
     stream_double.cpp \
     stream_txt.cpp \
     codegen_tree.cpp \
-    symboltable.cpp
+    symboltable.cpp \
+    codegen_revpolish.cpp \
+    codegen_base.cpp
 
 HEADERS  += mainwindow.h \
     lexer.h \
@@ -40,7 +42,8 @@ HEADERS  += mainwindow.h \
     stream_double.h \
     stream_txt.h \
     codegen_tree.h \
-    symboltable.h
+    symboltable.h \
+    codegen_revpolish.h
 
 FORMS    += mainwindow.ui \
     dialog.ui

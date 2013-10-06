@@ -3,28 +3,27 @@
 
 %%
 
-program		: listdecl listsent							{$$ = cod->node(CODE_PROGRAM, $1,$2);}
+program		: listdecl bloqsent							{$$ = cod->node(CODE_PROGRAM, $1,$2);}
 			;
 
-listdecl	: decl ';' listdecl							{ $$ = cod->node(CODE_DECLLIST, $1,$2);}
+listdecl	: decl ';' listdecl							{ $$ = cod->node(CODE_DECLLIST, $1,$3);}
 			|											{ $$ = cod->node(CODE_VOID);}
 			;
 			
 decl		: declvar
-			| FUNCTION BEGIN listdeclvar funcsentlist END { $$ = cod->node(CODE_FUNCTION, $1, $2); }
+			| FUNCTION BEGIN listdeclvar funcsentlist END { $$ = cod->node(CODE_FUNCTION, $3, $4); }
 			| FUNCTION error							{ notify("Se esperaba identificador.");}
 			;
 
 declvar		: TYPE listvar								{ $$ = cod->node(CODE_DECL, $1, $2);}
 			| TYPE error   								{ notify("Se esperaba identificador.");}
-			| error		  							 	{ notify("Se esperaba declaración.");}
 			;
 
-listdeclvar	: declvar ';' listdeclvar					{ $$ = cod->node(CODE_DECLLIST, $1,$2);}
+listdeclvar	: declvar ';' listdeclvar					{ $$ = cod->node(CODE_DECLLIST, $1,$3);}
 			|											{ $$ = cod->node(CODE_VOID);}
 			;
 
-funcsentlist: funcsent funcsentlist						{}
+funcsentlist: funcsent funcsentlist						{ $$ = cod->node(CODE_BLOCK, $1, $2); }
 			|											{ $$ = cod->node(CODE_VOID);}
 			;
 
@@ -37,7 +36,7 @@ listvar		: ID 										{ $$ = $1; }
 			| ID ',' listvar							{ $$ = cod->node(CODE_VARLIST, $1, $3);}
 			;
 
-bloqsent	: BEGIN listsent END						{ $$ = $1; }
+bloqsent	: BEGIN listsent END						{ $$ = $2; }
 			| sentencia									{ $$ = $1; }
 			;
 
@@ -64,13 +63,13 @@ if			: IF pcond THEN bloqsent					{$$ = cod->node(CODE_IF, $2, $4);}
 
 				 
 expr		: term 								{ $$ = $1; }
-			| expr '+' term						{ $$ = cod->node(CODE_EXPR, $1, '+', $3);}
-			| expr '-' term						{ $$ = cod->node(CODE_EXPR, $1, '-', $3);}
+			| expr '+' term						{ $$ = cod->node('+', $1, $3);}
+			| expr '-' term						{ $$ = cod->node('-', $1, $3);}
 			;
 			
 term 		: fact								{ $$ = $1; }
-			|  term '*' fact					{ $$ = cod->node(CODE_EXPR, $1, '*', $3);}
-			|  term '/' fact					{ $$ = cod->node(CODE_EXPR, $1, '/', $3);}					
+			|  term '*' fact					{ $$ = cod->node('*', $1, $3);}
+			|  term '/' fact					{ $$ = cod->node('/', $1, $3);}					
 			;
 		
 fact		: ID								{}
@@ -87,7 +86,7 @@ pcond		: '(' cond ')'						{$$ = $2; }
 			;
 			
 			
-cond	 	: expr comparador expr				{ $$ = cod->node(CODE_COND, $1, $2, $3);}
+cond	 	: expr comparador expr				{ $$ = cod->node($2, $1, $3);}
 			| expr comparador error				{ $$ = cod->node(CODE_VOID); notify("Se esperaba expreción");}
 			;
 

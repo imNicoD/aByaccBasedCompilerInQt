@@ -32,12 +32,11 @@ bool parser::check_range(int i)
         return true;
     return false;
 }
-#include <QDebug>
+
 int parser::negative(int i)
 {
     Attribute * attr = this->sym->value(i);
     QString vstr = "-"+attr->lexema;
-    qDebug() << attr->lexema;
     if(sym->contains(vstr))
         return sym->getIndex(vstr);
 

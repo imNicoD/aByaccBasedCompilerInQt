@@ -24,10 +24,16 @@ int codegen_print::node(int type, ...)
         case CODE_LOOP:
             this->strm->putLine("Se genera un Bucle.");
             break;
-        case CODE_COND:
+        //case CODE_COND:
+        case '<':
+        case '>':
             this->strm->putLine("Se genera una Comparación.");
             break;
-        case CODE_EXPR:
+        //case CODE_EXPR:
+        case '*':
+        case '+':
+        case '-':
+        case '/':
             this->strm->putLine("Se genera una Expreción.");
             break;
         case CODE_RETURN:

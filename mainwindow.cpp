@@ -150,6 +150,8 @@ void MainWindow::documentWasModified()
 #include "parser.h"
 #include "console.h"
 #include "codegen_tree.h"
+#include "codegen_revpolish.h"
+#include "codegen_print.h"
 #include "stream_double.h"
 #include "stream_txt.h"
 
@@ -162,8 +164,8 @@ void MainWindow::on_actionBuild_triggered()
     //Para la salida a Texto
     stream_txt txt("Result.txt");
     stream_double out(this, &txt);
-    codegen_tree tree;
-    parser p1(lexer, &out, &tree, symTable);
+    codegen_print code(this);
+    parser p1(lexer, &out, &code, symTable);
     p1.yyparse();
     for (int i=0; i<symTable->size(); i++)
     {
@@ -171,7 +173,7 @@ void MainWindow::on_actionBuild_triggered()
         Attribute* aux = symTable->value(names.at(i));
         txt.putLine(names.at(i) +QString(" ")+ aux->type);
     }
-    tree.dump();
+    //code.dump();
 }
 
 //Muestra en la Status Bar la linea en la que estoy
