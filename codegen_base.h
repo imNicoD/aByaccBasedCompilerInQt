@@ -19,6 +19,22 @@
 #define CODE_NEG        15
 #define CODE_VARLIST    16
 #define CODE_PROGRAM    17
+
+#define KIND_OPERATOR   0
+#define KIND_SYMBOL     1
+#define KIND_JUMP       2
+#define KIND_JUMPC      3
+#define KIND_LABEL      4
+#define KIND_ADDR       5
+#define KIND_CALL       6
+#define KIND_ENTRY      7
+#define KIND_PRINT      8
+#define KIND_RET        9
+
+#define TO_FW           0
+#define TO_BW           1
+#define TO_BBW          2
+
 #include <QString>
 
 int param_len(int type);
@@ -28,6 +44,8 @@ class codegen_base
 {
 public:
     virtual int node(int type, ...) = 0;
+
+    virtual void push(int kind, int val = 0){Q_UNUSED(kind);Q_UNUSED(val)}
 };
 
 #endif // CODEGEN_BASE_H

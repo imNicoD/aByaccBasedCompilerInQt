@@ -46,6 +46,21 @@ int parser::negative(int i)
     sym->insert(vstr, nattr);
     return sym->getIndex(vstr);
 }
+/*
+int parser::scope(int i)
+{
+    Attribute * attr = this->sym->value(i);
+
+    QString vstr = "S_"+attr->lexema;
+    if(sym->contains(vstr))
+        return sym->getIndex(vstr);
+
+    Attribute * nattr = new Attribute();
+    nattr->lexema = vstr;
+    nattr->type = attr->type;
+    sym->insert(vstr, nattr);
+    return sym->getIndex(vstr);
+}*/
 
 #define yyparse parser::yyparse
 #include "Y_TAB.C" // yypase()

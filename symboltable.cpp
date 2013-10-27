@@ -4,6 +4,19 @@ SymbolTable::SymbolTable()
 {
 
 }
+bool SymbolTable::setType(const int i, const QString type)
+{
+    QString key = index.value(i);
+    Attribute * a = attr.value(key);
+    if(a->type == "Id")
+    {
+        a->type = type;
+        return true;
+    }
+    else
+        return false;
+}
+
 
 void SymbolTable::insert(QString s, Attribute *attr)
 {

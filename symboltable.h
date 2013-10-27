@@ -9,6 +9,7 @@ class SymbolTable
 {
 public:
     SymbolTable();
+    bool setType(const int i, const QString type);
     void insert(QString s, Attribute * attr);
     bool contains(QString s);
     int getIndex(QString s);

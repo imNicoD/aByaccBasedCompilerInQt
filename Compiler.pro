@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     codegen_tree.cpp \
     symboltable.cpp \
     codegen_revpolish.cpp \
-    codegen_base.cpp
+    codegen_base.cpp \
+    asmgen.cpp
 
 HEADERS  += mainwindow.h \
     lexer.h \
@@ -43,7 +44,8 @@ HEADERS  += mainwindow.h \
     stream_txt.h \
     codegen_tree.h \
     symboltable.h \
-    codegen_revpolish.h
+    codegen_revpolish.h \
+    asmgen.h
 
 FORMS    += mainwindow.ui \
     dialog.ui

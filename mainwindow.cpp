@@ -154,6 +154,7 @@ void MainWindow::documentWasModified()
 #include "codegen_print.h"
 #include "stream_double.h"
 #include "stream_txt.h"
+#include "asmgen.h"
 
 void MainWindow::on_actionBuild_triggered()
 {
@@ -164,7 +165,7 @@ void MainWindow::on_actionBuild_triggered()
     //Para la salida a Texto
     stream_txt txt("Result.txt");
     stream_double out(this, &txt);
-    codegen_print code(this);
+    codegen_revpolish code;
     parser p1(lexer, &out, &code, symTable);
     p1.yyparse();
     for (int i=0; i<symTable->size(); i++)
@@ -173,7 +174,8 @@ void MainWindow::on_actionBuild_triggered()
         Attribute* aux = symTable->value(names.at(i));
         txt.putLine(names.at(i) +QString(" ")+ aux->type);
     }
-    //code.dump();
+    asmgen gen(symTable, new console());
+    gen.generate(code.getRP());
 }
 
 //Muestra en la Status Bar la linea en la que estoy

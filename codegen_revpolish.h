@@ -3,16 +3,19 @@
 
 #include "codegen_base.h"
 #include <QVector>
+typedef struct {int type; int val;} rp_node_t;
 
 class codegen_revpolish : public codegen_base
 {
 public:
     codegen_revpolish();
     int node(int type, ...);
+    void push(int kind, int val = 0);
+    QVector<rp_node_t> * getRP();
     void dump();
 private:
-    typedef struct {int type; int val;} node_t;
-    QVector<QVector<node_t> > V;
+    QVector<rp_node_t> V;
+    QVector<int> labelStack;
 };
 
 #endif // CODEGEN_REVPOLISH_H
