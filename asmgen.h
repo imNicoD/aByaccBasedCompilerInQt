@@ -15,6 +15,15 @@ private:
     void init();
     SymbolTable * sym;
     stream_base * out;
+
+
+
+    QMap<int, QString> cmp; // jump on fail
+    int used[4] = {0,0,0,0};
+    QVector<int> v;
+    int A,B,r;
+    QString As,Bs;
+    QString reg [] = {"EBX", "ECX", "EAX", "EDX"};
 };
 
 #endif // ASMGEN_H

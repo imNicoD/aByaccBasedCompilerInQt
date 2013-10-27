@@ -8,6 +8,13 @@ asmgen::asmgen(SymbolTable *sym, stream_base *out)
 {
     this->sym = sym;
     this->out = out;
+    v.append(54391);
+    cmp.insert('<',"JGE");
+    cmp.insert(LEQ,"JG");
+    cmp.insert(EQU,"JNE");
+    cmp.insert(NEQ,"JE");
+    cmp.insert('>',"JLE");
+    cmp.insert(GEQ,"JL");
 }
 
 void asmgen::data_out()
@@ -50,22 +57,11 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
 {
     init();
     data_out();
-    QVector<int> v;
-    int A,B,r = 0;
-    QString As,Bs;
-    QString reg [] = {"EBX", "ECX", "EAX", "EDX"};
-    int used[4] = {0,0,0,0};
-    QMap<int, QString> cmp; // jump on fail
-    cmp.insert('<',"JGE");
-    cmp.insert(LEQ,"JG");
-    cmp.insert(EQU,"JNE");
-    cmp.insert(NEQ,"JE");
-    cmp.insert('>',"JLE");
-    cmp.insert(GEQ,"JL");
     out->putLine(".CODE");
     out->putLine("start:");
     for(int i = 0; i < rev_polish->size(); i++)
     {
+        r=0;
         rp_node_t n = rev_polish->value(i);
         switch (n.type) {
         case KIND_SYMBOL:
@@ -75,8 +71,18 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
         case KIND_CALL:
             A = v.last();
             v.removeLast();
+            out->putLine("\tSUB ESP, 4");
+            out->putLine("\tPUSH EAX");
+            out->putLine("\tPUSH EBX");
+            out->putLine("\tPUSH ECX");
+            out->putLine("\tPUSH EDX");
             out->putLine("\tCALL _"+sym->value(A)->lexema);
-            // pop
+            out->putLine("\tPOP EDX");
+            out->putLine("\tPOP ECX");
+            out->putLine("\tPOP EBX");
+            out->putLine("\tPOP EAX");
+            while(r<4&&used[r]) r++;
+            out->putLine("\tPOP "+reg[r]);
             break;
         case KIND_ENTRY:
             out->putLine("_"+sym->value(i)->lexema+":");
@@ -139,55 +145,137 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                 out->putLine("\tJO ADDOV_ERROR");
                 break;
             case '-':
-                break;
-            case '*':
-                if(A==-3) // si A en EAX
+                if(A<0) // si A en registro
                 {
-                    if(used[3])
-                    {
-                        while(r<2&&used[0])r++;
-                        if(r<2)
-                        {
-                            out->putLine("\tMOV "+reg[r]+","+reg[3]);
-                            used[r] = used[3];
-                            v.remove(used[r]);
-                            v.insert(used[r],-r-3);
-                        }
-                        else
-                            qDebug() << "* regs overflow!!!";
-                    }
-                    out->putLine("\tIMUL "+As+","+Bs);
+                    out->putLine("\tSUB "+As+","+Bs);
                     used[-A-1] = v.size();
                     v.push_back(A);
                 }
-                else if(B==-3) // si B en registro
+                else if(B<0) // si B en registro
                 {
-                    if(used[3])
-                    {
-                        while(r<2&&used[0])r++;
-                        if(r<2)
-                        {
-                            out->putLine("\tMOV "+reg[r]+","+reg[3]);
-                            used[r] = used[3];
-                            v.remove(used[r]);
-                            v.insert(used[r],-r-3);
-                        }
-                        else
-                            qDebug() << "* regs overflow!!!";
-                    }
-                    out->putLine("\tIMUL "+Bs+","+As);
+                    out->putLine("\tNEG "+Bs);
+                    out->putLine("\tADD "+As+","+Bs);
                     used[-B-1] = v.size();
                     v.push_back(B);
                 }
                 else // todos en memoria
                 {
-                    // TODO:
                     while(r<4&&used[r]) r++;
                     out->putLine("\tmov "+reg[r]+","+As);
-                    out->putLine("\tIMUL "+reg[r]+","+Bs);
+                    out->putLine("\tSUB "+reg[r]+","+Bs);
                     used[-r-1] = v.size();
                     v.push_back(-r-1);
                 }
+                out->putLine("\tJO ADDOV_ERROR");
+                break;
+            case '*':
+                if(A<0&&B!=-3) // si A en Reg
+                {
+                    if(A!=-3)
+                    {
+                        out->putLine("\tXOR EAX,"+As);
+                        out->putLine("\tXOR "+As+",EAX");
+                        out->putLine("\tXOR EAX,"+As);
+                        used[-A-1] = used[2];
+                        used[2] = 0;
+                        v.remove(used[-A-1]);
+                        v.insert(used[-A-1],-A-1);
+                    }
+                    if(used[3])
+                    {
+                        while(r<2&&used[0])r++;
+                        if(r<2)
+                        {
+                            if(B==-r-1)
+                            {
+                                out->putLine("\tXOR "+reg[r]+","+reg[3]);
+                                out->putLine("\tXOR "+reg[3]+","+reg[r]);
+                                out->putLine("\tXOR "+reg[r]+","+reg[3]);
+                                Bs = reg[3];
+                            }
+                            else
+                                out->putLine("\tMOV "+reg[r]+","+reg[3]);
+                            used[r] = used[3];
+                            used[3] = 0;
+                            v.remove(used[r]);
+                            v.insert(used[r],-r-3);
+                        }
+                        else
+                            qDebug() << "* regs overflow!!!";
+                    }
+                    out->putLine("\tIMUL "+Bs);
+                }
+                else if(B<0) // si B en Reg
+                {
+                    if(B!=-3)
+                    {
+                        out->putLine("\tXOR EAX,"+Bs);
+                        out->putLine("\tXOR "+Bs+",EAX");
+                        out->putLine("\tXOR EAX,"+Bs);
+                        used[-B-1] = used[2];
+                        used[2] = 0;
+                        v.remove(used[-B-1]);
+                        v.insert(used[-B-1],-B-1);
+                    }
+                    if(used[3])
+                    {
+                        while(r<2&&used[0])r++;
+                        if(r<2)
+                        {
+                            if(A==-r-1)
+                            {//swap
+                                out->putLine("\tXOR "+reg[r]+","+reg[3]);
+                                out->putLine("\tXOR "+reg[3]+","+reg[r]);
+                                out->putLine("\tXOR "+reg[r]+","+reg[3]);
+                                As = reg[3];
+                            }
+                            else
+                                out->putLine("\tMOV "+reg[r]+","+reg[3]);
+                            used[r] = used[3];
+                            used[3] = 0;
+                            v.remove(used[r]);
+                            v.insert(used[r],-r-3);
+                        }
+                        else
+                            qDebug() << "* regs overflow!!!";
+                    }
+                    out->putLine("\tIMUL "+As);
+                }
+                else // En memoria
+                {
+                    if(used[2])
+                    {
+                        while(r<2&&used[0])r++;
+                        if(r<2)
+                        {
+                           out->putLine("\tMOV "+reg[r]+","+reg[2]);
+                            used[r] = used[2];
+                            used[2] = 0;
+                            v.remove(used[r]);
+                            v.insert(used[r],-r-2);
+                        }
+                        else
+                            qDebug() << "* regs overflow!!!";
+                    }r=0;
+                    if(used[3])
+                    {
+                        while(r<2&&used[0])r++;
+                        if(r<2)
+                        {
+                           out->putLine("\tMOV "+reg[r]+","+reg[3]);
+                            used[r] = used[3];
+                            used[3] = 0;
+                            v.remove(used[r]);
+                            v.insert(used[r],-r-3);
+                        }
+                        else
+                            qDebug() << "* regs overflow!!!";
+                    }
+                    out->putLine("\tMOV EAX,"+As);
+                    out->putLine("\tIMUL "+Bs);
+                }
+                used[2] = v.size();
+                v.push_back(-2-1);
                 out->putLine("\tJO MULOV_ERROR");
                 break;
             case '/':
@@ -218,7 +306,10 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
         case KIND_RET:
             A = v.last();
             v.removeLast();
-            out->putLine("\tPUSH _"+A);
+            if(A<0){ As = reg[-A-1]; used[-A-1] = 0;}
+            else    As = "_"+sym->value(A)->lexema;
+            out->putLine("\tMOV [ebp+20],"+As);
+            out->putLine("\tPOP ebp");
             out->putLine("\tRET");
         default:
             break;
@@ -233,5 +324,5 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
     out->putLine(QString("\tinvoke MessageBox, NULL, addr MULOV, addr MULOV, MB_OK"));
     out->putLine("finally:");
     out->putLine("invoke ExitProcess, 0");
-    out->putLine("end start");
+    out->putLine(" ");
 }
