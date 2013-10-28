@@ -19,7 +19,13 @@ private:
     void notify(const char * c);
     bool check_range(int i);
     int negative(int i);
+    void fIn();
+    void fOut();
+    int decl(int i);
+    bool setType(int i, QString type);
     bool error;
+    bool function;
+    int ambito;
     lexer_base  * lex;
     stream_base * err;
     codegen_base* cod;

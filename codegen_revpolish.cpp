@@ -70,7 +70,6 @@ void codegen_revpolish::push(int kind, int val)
             V.push_back({KIND_ADDR});
         }
     }
-
     V.push_back({kind, val});
 }
 

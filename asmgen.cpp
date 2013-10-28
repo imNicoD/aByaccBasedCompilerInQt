@@ -372,11 +372,11 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             case GEQ:
             case LEQ:
                 if(A<0||B<0) // Alguno esta en un registro.
-                    out->putLine("\tcmp "+As+","+Bs);
+                    out->putLine("\tcmp "+Bs+","+As);
                 else // ambos en memoria
                 {
-                    out->putLine("\tmov EAX,"+As);
-                    out->putLine("\tcmp EAX,"+Bs);
+                    out->putLine("\tmov EAX,"+Bs);
+                    out->putLine("\tcmp EAX,"+As);
                 }
                 v.push_back(n.val);
             default:
@@ -399,7 +399,6 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             break;
         }
     }
-    out->putLine("");
     out->putLine("\tJMP finally");
     out->putLine("ADDOV_ERROR:");
     out->putLine(QString("\tinvoke MessageBox, NULL, addr ADDOV, addr ADDOV, MB_OK"));

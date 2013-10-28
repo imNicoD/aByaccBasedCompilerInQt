@@ -9,84 +9,87 @@
    5           |
 
    6  decl : declvar
-   7       | FUNCTION BEGIN listdeclvar funcsentlist END
-   8       | FUNCTION error
 
-   9  declvar : TYPE listvar
-  10          | TYPE error
+   7  $$2 :
 
-  11  listdeclvar : declvar ';' listdeclvar
-  12              |
+   8  decl : FUNCTION BEGIN $$2 listdeclvar funcsentlist END
+   9       | FUNCTION error
 
-  13  funcsentlist : funcsent funcsentlist
-  14               |
+  10  declvar : TYPE listvar
+  11          | TYPE error
 
-  15  funcsent : sentencia ';'
-  16           | ID ':'
+  12  listdeclvar : declvar ';' listdeclvar
+  13              |
 
-  17  listvar : ID
-  18          | ID ',' listvar
+  14  funcsentlist : funcsent funcsentlist
+  15               |
 
-  19  bloqsent : BEGIN listsent END
-  20           | sentencia
+  16  funcsent : sentencia ';'
+  17           | ID ':'
 
-  21  listsent : sentencia ';' listsent
-  22           |
+  18  listvar : ID
+  19          | ID ',' listvar
 
-  23  sentencia : if
+  20  bloqsent : BEGIN listsent END
+  21           | sentencia
 
-  24  $$2 :
+  22  listsent : sentencia ';' listsent
+  23           |
 
-  25  sentencia : LOOP $$2 bloqsent UNTIL cond
-  26            | RETURN '(' expr ')'
-  27            | PRINT '(' STR ')'
-  28            | ID '=' expr
-  29            | ID error
-  30            | RETURN error
-  31            | PRINT '(' error
-  32            | PRINT error
-  33            |
+  24  sentencia : if
 
-  34  $$3 :
+  25  $$3 :
+
+  26  sentencia : LOOP $$3 bloqsent UNTIL cond
+  27            | RETURN '(' expr ')'
+  28            | PRINT '(' STR ')'
+  29            | ID '=' expr
+  30            | ID error
+  31            | RETURN error
+  32            | PRINT '(' error
+  33            | PRINT error
+  34            |
 
   35  $$4 :
 
-  36  if : IF pcond $$3 THEN bloqsent $$4 else
-  37     | IF pcond error
+  36  $$5 :
 
-  38  $$5 :
+  37  if : IF pcond $$4 THEN bloqsent $$5 else
+  38     | IF pcond error
 
-  39  else : ELSE $$5 bloqsent
-  40       |
+  39  $$6 :
 
-  41  expr : term
-  42       | expr '+' term
-  43       | expr '-' term
+  40  else : ELSE $$6 bloqsent
+  41       |
 
-  44  term : fact
-  45       | term '*' fact
-  46       | term '/' fact
+  42  expr : term
+  43       | expr '+' term
+  44       | expr '-' term
 
-  47  fact : ID
-  48       | CONST
-  49       | '-' CONST
-  50       | ID '(' ')'
-  51       | ID '(' error
+  45  term : fact
+  46       | term '*' fact
+  47       | term '/' fact
 
-  52  pcond : '(' cond ')'
-  53        | '(' cond error
-  54        | '(' error
-  55        | error
+  48  fact : ID
+  49       | CONST
+  50       | '-' CONST
+  51       | ID '(' ')'
+  52       | ID '(' error
 
-  56  cond : expr comparador expr
-  57       | expr comparador error
+  53  pcond : '(' cond ')'
+  54        | '(' cond error
+  55        | '(' error
+  56        | error
 
-  58  comparador : '<'
-  59             | '>'
-  60             | LEQ
-  61             | GEQ
-  62             | NEQ
-  63             | EQU
+  57  cond : expr comparador expr
+  58       | expr comparador error
+
+  59  comparador : '<'
+  60             | '>'
+  61             | LEQ
+  62             | GEQ
+  63             | NEQ
+  64             | EQU
 
 state 0
 	$accept : . program $end  (0)
@@ -117,8 +120,8 @@ state 1
 
 
 state 2
-	decl : FUNCTION . BEGIN listdeclvar funcsentlist END  (7)
-	decl : FUNCTION . error  (8)
+	decl : FUNCTION . BEGIN $$2 listdeclvar funcsentlist END  (8)
+	decl : FUNCTION . error  (9)
 
 	error  shift 9
 	BEGIN  shift 10
@@ -126,8 +129,8 @@ state 2
 
 
 state 3
-	declvar : TYPE . listvar  (9)
-	declvar : TYPE . error  (10)
+	declvar : TYPE . listvar  (10)
+	declvar : TYPE . error  (11)
 
 	error  shift 11
 	ID  shift 12
@@ -185,63 +188,55 @@ state 8
 
 
 state 9
-	decl : FUNCTION error .  (8)
-
-	.  reduce 8
-
-
-state 10
-	decl : FUNCTION BEGIN . listdeclvar funcsentlist END  (7)
-	listdeclvar : .  (12)
-
-	TYPE  shift 3
-	END  reduce 12
-	RETURN  reduce 12
-	PRINT  reduce 12
-	IF  reduce 12
-	LOOP  reduce 12
-	ID  reduce 12
-	';'  reduce 12
-
-	declvar  goto 17
-	listdeclvar  goto 18
-
-
-state 11
-	declvar : TYPE error .  (10)
-
-	.  reduce 10
-
-
-state 12
-	listvar : ID .  (17)
-	listvar : ID . ',' listvar  (18)
-
-	','  shift 19
-	';'  reduce 17
-
-
-state 13
-	declvar : TYPE listvar .  (9)
+	decl : FUNCTION error .  (9)
 
 	.  reduce 9
 
 
+state 10
+	decl : FUNCTION BEGIN . $$2 listdeclvar funcsentlist END  (8)
+	$$2 : .  (7)
+
+	.  reduce 7
+
+	$$2  goto 17
+
+
+state 11
+	declvar : TYPE error .  (11)
+
+	.  reduce 11
+
+
+state 12
+	listvar : ID .  (18)
+	listvar : ID . ',' listvar  (19)
+
+	','  shift 18
+	';'  reduce 18
+
+
+state 13
+	declvar : TYPE listvar .  (10)
+
+	.  reduce 10
+
+
 state 14
 	program : listdecl $$1 . bloqsent  (2)
-	sentencia : .  (33)
+	sentencia : .  (34)
 
-	BEGIN  shift 20
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 25
-	$end  reduce 33
+	BEGIN  shift 19
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 24
+	$end  reduce 34
 
-	bloqsent  goto 26
-	sentencia  goto 27
-	if  goto 28
+	bloqsent  goto 25
+	sentencia  goto 26
+	if  goto 27
 
 
 state 15
@@ -259,7 +254,7 @@ state 15
 	LOOP  reduce 5
 	ID  reduce 5
 
-	listdecl  goto 29
+	listdecl  goto 28
 	decl  goto 6
 	declvar  goto 7
 
@@ -271,721 +266,411 @@ state 16
 
 
 state 17
-	listdeclvar : declvar . ';' listdeclvar  (11)
+	decl : FUNCTION BEGIN $$2 . listdeclvar funcsentlist END  (8)
+	listdeclvar : .  (13)
 
-	';'  shift 30
-	.  error
+	TYPE  shift 3
+	END  reduce 13
+	RETURN  reduce 13
+	PRINT  reduce 13
+	IF  reduce 13
+	LOOP  reduce 13
+	ID  reduce 13
+	';'  reduce 13
+
+	declvar  goto 29
+	listdeclvar  goto 30
 
 
 state 18
-	decl : FUNCTION BEGIN listdeclvar . funcsentlist END  (7)
-	funcsentlist : .  (14)
-	sentencia : .  (33)
-
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 31
-	END  reduce 14
-	';'  reduce 33
-
-	funcsentlist  goto 32
-	funcsent  goto 33
-	sentencia  goto 34
-	if  goto 28
-
-
-state 19
-	listvar : ID ',' . listvar  (18)
+	listvar : ID ',' . listvar  (19)
 
 	ID  shift 12
 	.  error
 
-	listvar  goto 35
+	listvar  goto 31
+
+
+state 19
+	bloqsent : BEGIN . listsent END  (20)
+	listsent : .  (23)
+	sentencia : .  (34)
+
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 24
+	END  reduce 23
+	';'  reduce 34
+
+	sentencia  goto 32
+	listsent  goto 33
+	if  goto 27
 
 
 state 20
-	bloqsent : BEGIN . listsent END  (19)
-	listsent : .  (22)
-	sentencia : .  (33)
+	sentencia : RETURN . '(' expr ')'  (27)
+	sentencia : RETURN . error  (31)
 
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 25
-	END  reduce 22
-	';'  reduce 33
-
-	sentencia  goto 36
-	listsent  goto 37
-	if  goto 28
+	error  shift 34
+	'('  shift 35
+	.  error
 
 
 state 21
-	sentencia : RETURN . '(' expr ')'  (26)
-	sentencia : RETURN . error  (30)
+	sentencia : PRINT . '(' STR ')'  (28)
+	sentencia : PRINT . '(' error  (32)
+	sentencia : PRINT . error  (33)
+
+	error  shift 36
+	'('  shift 37
+	.  error
+
+
+state 22
+	if : IF . pcond $$4 THEN bloqsent $$5 else  (37)
+	if : IF . pcond error  (38)
 
 	error  shift 38
 	'('  shift 39
 	.  error
 
-
-state 22
-	sentencia : PRINT . '(' STR ')'  (27)
-	sentencia : PRINT . '(' error  (31)
-	sentencia : PRINT . error  (32)
-
-	error  shift 40
-	'('  shift 41
-	.  error
+	pcond  goto 40
 
 
 state 23
-	if : IF . pcond $$3 THEN bloqsent $$4 else  (36)
-	if : IF . pcond error  (37)
+	sentencia : LOOP . $$3 bloqsent UNTIL cond  (26)
+	$$3 : .  (25)
 
-	error  shift 42
-	'('  shift 43
-	.  error
+	.  reduce 25
 
-	pcond  goto 44
+	$$3  goto 41
 
 
 state 24
-	sentencia : LOOP . $$2 bloqsent UNTIL cond  (25)
-	$$2 : .  (24)
+	sentencia : ID . '=' expr  (29)
+	sentencia : ID . error  (30)
 
-	.  reduce 24
-
-	$$2  goto 45
-
-
-state 25
-	sentencia : ID . '=' expr  (28)
-	sentencia : ID . error  (29)
-
-	error  shift 46
-	'='  shift 47
+	error  shift 42
+	'='  shift 43
 	.  error
 
 
-state 26
+state 25
 	program : listdecl $$1 bloqsent .  (2)
 
 	.  reduce 2
 
 
-state 27
-	bloqsent : sentencia .  (20)
+state 26
+	bloqsent : sentencia .  (21)
 
-	.  reduce 20
+	.  reduce 21
+
+
+state 27
+	sentencia : if .  (24)
+
+	.  reduce 24
 
 
 state 28
-	sentencia : if .  (23)
-
-	.  reduce 23
-
-
-state 29
 	listdecl : decl ';' listdecl .  (3)
 
 	.  reduce 3
 
 
-state 30
-	listdeclvar : declvar ';' . listdeclvar  (11)
-	listdeclvar : .  (12)
+state 29
+	listdeclvar : declvar . ';' listdeclvar  (12)
 
-	TYPE  shift 3
-	END  reduce 12
-	RETURN  reduce 12
-	PRINT  reduce 12
-	IF  reduce 12
-	LOOP  reduce 12
-	ID  reduce 12
-	';'  reduce 12
-
-	declvar  goto 17
-	listdeclvar  goto 48
-
-
-state 31
-	funcsent : ID . ':'  (16)
-	sentencia : ID . '=' expr  (28)
-	sentencia : ID . error  (29)
-
-	error  shift 46
-	':'  shift 49
-	'='  shift 47
+	';'  shift 44
 	.  error
 
 
+state 30
+	decl : FUNCTION BEGIN $$2 listdeclvar . funcsentlist END  (8)
+	funcsentlist : .  (15)
+	sentencia : .  (34)
+
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 45
+	END  reduce 15
+	';'  reduce 34
+
+	funcsentlist  goto 46
+	funcsent  goto 47
+	sentencia  goto 48
+	if  goto 27
+
+
+state 31
+	listvar : ID ',' listvar .  (19)
+
+	.  reduce 19
+
+
 state 32
-	decl : FUNCTION BEGIN listdeclvar funcsentlist . END  (7)
+	listsent : sentencia . ';' listsent  (22)
+
+	';'  shift 49
+	.  error
+
+
+state 33
+	bloqsent : BEGIN listsent . END  (20)
 
 	END  shift 50
 	.  error
 
 
-state 33
-	funcsentlist : funcsent . funcsentlist  (13)
-	funcsentlist : .  (14)
-	sentencia : .  (33)
-
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 31
-	END  reduce 14
-	';'  reduce 33
-
-	funcsentlist  goto 51
-	funcsent  goto 33
-	sentencia  goto 34
-	if  goto 28
-
-
 state 34
-	funcsent : sentencia . ';'  (15)
-
-	';'  shift 52
-	.  error
-
-
-state 35
-	listvar : ID ',' listvar .  (18)
-
-	.  reduce 18
-
-
-state 36
-	listsent : sentencia . ';' listsent  (21)
-
-	';'  shift 53
-	.  error
-
-
-state 37
-	bloqsent : BEGIN listsent . END  (19)
-
-	END  shift 54
-	.  error
-
-
-state 38
-	sentencia : RETURN error .  (30)
-
-	.  reduce 30
-
-
-state 39
-	sentencia : RETURN '(' . expr ')'  (26)
-
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
-	.  error
-
-	expr  goto 58
-	term  goto 59
-	fact  goto 60
-
-
-state 40
-	sentencia : PRINT error .  (32)
-
-	.  reduce 32
-
-
-state 41
-	sentencia : PRINT '(' . STR ')'  (27)
-	sentencia : PRINT '(' . error  (31)
-
-	error  shift 61
-	STR  shift 62
-	.  error
-
-
-state 42
-	pcond : error .  (55)
-
-	.  reduce 55
-
-
-state 43
-	pcond : '(' . cond ')'  (52)
-	pcond : '(' . cond error  (53)
-	pcond : '(' . error  (54)
-
-	error  shift 63
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
-	.  error
-
-	cond  goto 64
-	expr  goto 65
-	term  goto 59
-	fact  goto 60
-
-
-state 44
-	if : IF pcond . $$3 THEN bloqsent $$4 else  (36)
-	if : IF pcond . error  (37)
-	$$3 : .  (34)
-
-	error  shift 66
-	THEN  reduce 34
-
-	$$3  goto 67
-
-
-state 45
-	sentencia : LOOP $$2 . bloqsent UNTIL cond  (25)
-	sentencia : .  (33)
-
-	BEGIN  shift 20
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 25
-	UNTIL  reduce 33
-
-	bloqsent  goto 68
-	sentencia  goto 27
-	if  goto 28
-
-
-state 46
-	sentencia : ID error .  (29)
-
-	.  reduce 29
-
-
-state 47
-	sentencia : ID '=' . expr  (28)
-
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
-	.  error
-
-	expr  goto 69
-	term  goto 59
-	fact  goto 60
-
-
-state 48
-	listdeclvar : declvar ';' listdeclvar .  (11)
-
-	.  reduce 11
-
-
-state 49
-	funcsent : ID ':' .  (16)
-
-	.  reduce 16
-
-
-state 50
-	decl : FUNCTION BEGIN listdeclvar funcsentlist END .  (7)
-
-	.  reduce 7
-
-
-state 51
-	funcsentlist : funcsent funcsentlist .  (13)
-
-	.  reduce 13
-
-
-state 52
-	funcsent : sentencia ';' .  (15)
-
-	.  reduce 15
-
-
-state 53
-	listsent : sentencia ';' . listsent  (21)
-	listsent : .  (22)
-	sentencia : .  (33)
-
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 25
-	END  reduce 22
-	';'  reduce 33
-
-	sentencia  goto 36
-	listsent  goto 70
-	if  goto 28
-
-
-state 54
-	bloqsent : BEGIN listsent END .  (19)
-
-	.  reduce 19
-
-
-state 55
-	fact : ID .  (47)
-	fact : ID . '(' ')'  (50)
-	fact : ID . '(' error  (51)
-
-	'('  shift 71
-	$end  reduce 47
-	error  reduce 47
-	ELSE  reduce 47
-	UNTIL  reduce 47
-	EQU  reduce 47
-	NEQ  reduce 47
-	GEQ  reduce 47
-	LEQ  reduce 47
-	';'  reduce 47
-	')'  reduce 47
-	'+'  reduce 47
-	'-'  reduce 47
-	'*'  reduce 47
-	'/'  reduce 47
-	'<'  reduce 47
-	'>'  reduce 47
-
-
-state 56
-	fact : CONST .  (48)
-
-	.  reduce 48
-
-
-state 57
-	fact : '-' . CONST  (49)
-
-	CONST  shift 72
-	.  error
-
-
-state 58
-	sentencia : RETURN '(' expr . ')'  (26)
-	expr : expr . '+' term  (42)
-	expr : expr . '-' term  (43)
-
-	')'  shift 73
-	'+'  shift 74
-	'-'  shift 75
-	.  error
-
-
-state 59
-	expr : term .  (41)
-	term : term . '*' fact  (45)
-	term : term . '/' fact  (46)
-
-	'*'  shift 76
-	'/'  shift 77
-	$end  reduce 41
-	error  reduce 41
-	ELSE  reduce 41
-	UNTIL  reduce 41
-	EQU  reduce 41
-	NEQ  reduce 41
-	GEQ  reduce 41
-	LEQ  reduce 41
-	';'  reduce 41
-	')'  reduce 41
-	'+'  reduce 41
-	'-'  reduce 41
-	'<'  reduce 41
-	'>'  reduce 41
-
-
-state 60
-	term : fact .  (44)
-
-	.  reduce 44
-
-
-state 61
-	sentencia : PRINT '(' error .  (31)
+	sentencia : RETURN error .  (31)
 
 	.  reduce 31
 
 
-state 62
-	sentencia : PRINT '(' STR . ')'  (27)
+state 35
+	sentencia : RETURN '(' . expr ')'  (27)
 
-	')'  shift 78
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	expr  goto 54
+	term  goto 55
+	fact  goto 56
+
+
+state 36
+	sentencia : PRINT error .  (33)
+
+	.  reduce 33
+
+
+state 37
+	sentencia : PRINT '(' . STR ')'  (28)
+	sentencia : PRINT '(' . error  (32)
+
+	error  shift 57
+	STR  shift 58
 	.  error
 
 
-state 63
-	pcond : '(' error .  (54)
+state 38
+	pcond : error .  (56)
 
-	.  reduce 54
+	.  reduce 56
 
 
-state 64
-	pcond : '(' cond . ')'  (52)
-	pcond : '(' cond . error  (53)
+state 39
+	pcond : '(' . cond ')'  (53)
+	pcond : '(' . cond error  (54)
+	pcond : '(' . error  (55)
 
-	error  shift 79
-	')'  shift 80
+	error  shift 59
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	cond  goto 60
+	expr  goto 61
+	term  goto 55
+	fact  goto 56
+
+
+state 40
+	if : IF pcond . $$4 THEN bloqsent $$5 else  (37)
+	if : IF pcond . error  (38)
+	$$4 : .  (35)
+
+	error  shift 62
+	THEN  reduce 35
+
+	$$4  goto 63
+
+
+state 41
+	sentencia : LOOP $$3 . bloqsent UNTIL cond  (26)
+	sentencia : .  (34)
+
+	BEGIN  shift 19
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 24
+	UNTIL  reduce 34
+
+	bloqsent  goto 64
+	sentencia  goto 26
+	if  goto 27
+
+
+state 42
+	sentencia : ID error .  (30)
+
+	.  reduce 30
+
+
+state 43
+	sentencia : ID '=' . expr  (29)
+
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	expr  goto 65
+	term  goto 55
+	fact  goto 56
+
+
+state 44
+	listdeclvar : declvar ';' . listdeclvar  (12)
+	listdeclvar : .  (13)
+
+	TYPE  shift 3
+	END  reduce 13
+	RETURN  reduce 13
+	PRINT  reduce 13
+	IF  reduce 13
+	LOOP  reduce 13
+	ID  reduce 13
+	';'  reduce 13
+
+	declvar  goto 29
+	listdeclvar  goto 66
+
+
+state 45
+	funcsent : ID . ':'  (17)
+	sentencia : ID . '=' expr  (29)
+	sentencia : ID . error  (30)
+
+	error  shift 42
+	':'  shift 67
+	'='  shift 43
 	.  error
 
 
-state 65
-	expr : expr . '+' term  (42)
-	expr : expr . '-' term  (43)
-	cond : expr . comparador expr  (56)
-	cond : expr . comparador error  (57)
+state 46
+	decl : FUNCTION BEGIN $$2 listdeclvar funcsentlist . END  (8)
 
-	EQU  shift 81
-	NEQ  shift 82
-	GEQ  shift 83
-	LEQ  shift 84
-	'+'  shift 74
-	'-'  shift 75
-	'<'  shift 85
-	'>'  shift 86
-	.  error
-
-	comparador  goto 87
-
-
-state 66
-	if : IF pcond error .  (37)
-
-	.  reduce 37
-
-
-state 67
-	if : IF pcond $$3 . THEN bloqsent $$4 else  (36)
-
-	THEN  shift 88
+	END  shift 68
 	.  error
 
 
-state 68
-	sentencia : LOOP $$2 bloqsent . UNTIL cond  (25)
+state 47
+	funcsentlist : funcsent . funcsentlist  (14)
+	funcsentlist : .  (15)
+	sentencia : .  (34)
 
-	UNTIL  shift 89
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 45
+	END  reduce 15
+	';'  reduce 34
+
+	funcsentlist  goto 69
+	funcsent  goto 47
+	sentencia  goto 48
+	if  goto 27
+
+
+state 48
+	funcsent : sentencia . ';'  (16)
+
+	';'  shift 70
 	.  error
 
 
-state 69
-	sentencia : ID '=' expr .  (28)
-	expr : expr . '+' term  (42)
-	expr : expr . '-' term  (43)
+state 49
+	listsent : sentencia ';' . listsent  (22)
+	listsent : .  (23)
+	sentencia : .  (34)
 
-	'+'  shift 74
-	'-'  shift 75
-	$end  reduce 28
-	ELSE  reduce 28
-	UNTIL  reduce 28
-	';'  reduce 28
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 24
+	END  reduce 23
+	';'  reduce 34
 
-
-state 70
-	listsent : sentencia ';' listsent .  (21)
-
-	.  reduce 21
-
-
-state 71
-	fact : ID '(' . ')'  (50)
-	fact : ID '(' . error  (51)
-
-	error  shift 90
-	')'  shift 91
-	.  error
+	sentencia  goto 32
+	listsent  goto 71
+	if  goto 27
 
 
-state 72
-	fact : '-' CONST .  (49)
+state 50
+	bloqsent : BEGIN listsent END .  (20)
+
+	.  reduce 20
+
+
+state 51
+	fact : ID .  (48)
+	fact : ID . '(' ')'  (51)
+	fact : ID . '(' error  (52)
+
+	'('  shift 72
+	$end  reduce 48
+	error  reduce 48
+	ELSE  reduce 48
+	UNTIL  reduce 48
+	EQU  reduce 48
+	NEQ  reduce 48
+	GEQ  reduce 48
+	LEQ  reduce 48
+	';'  reduce 48
+	')'  reduce 48
+	'+'  reduce 48
+	'-'  reduce 48
+	'*'  reduce 48
+	'/'  reduce 48
+	'<'  reduce 48
+	'>'  reduce 48
+
+
+state 52
+	fact : CONST .  (49)
 
 	.  reduce 49
 
 
-state 73
-	sentencia : RETURN '(' expr ')' .  (26)
+state 53
+	fact : '-' . CONST  (50)
 
-	.  reduce 26
-
-
-state 74
-	expr : expr '+' . term  (42)
-
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
+	CONST  shift 73
 	.  error
 
-	term  goto 92
-	fact  goto 60
 
+state 54
+	sentencia : RETURN '(' expr . ')'  (27)
+	expr : expr . '+' term  (43)
+	expr : expr . '-' term  (44)
 
-state 75
-	expr : expr '-' . term  (43)
-
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
+	')'  shift 74
+	'+'  shift 75
+	'-'  shift 76
 	.  error
 
-	term  goto 93
-	fact  goto 60
 
+state 55
+	expr : term .  (42)
+	term : term . '*' fact  (46)
+	term : term . '/' fact  (47)
 
-state 76
-	term : term '*' . fact  (45)
-
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
-	.  error
-
-	fact  goto 94
-
-
-state 77
-	term : term '/' . fact  (46)
-
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
-	.  error
-
-	fact  goto 95
-
-
-state 78
-	sentencia : PRINT '(' STR ')' .  (27)
-
-	.  reduce 27
-
-
-state 79
-	pcond : '(' cond error .  (53)
-
-	.  reduce 53
-
-
-state 80
-	pcond : '(' cond ')' .  (52)
-
-	.  reduce 52
-
-
-state 81
-	comparador : EQU .  (63)
-
-	.  reduce 63
-
-
-state 82
-	comparador : NEQ .  (62)
-
-	.  reduce 62
-
-
-state 83
-	comparador : GEQ .  (61)
-
-	.  reduce 61
-
-
-state 84
-	comparador : LEQ .  (60)
-
-	.  reduce 60
-
-
-state 85
-	comparador : '<' .  (58)
-
-	.  reduce 58
-
-
-state 86
-	comparador : '>' .  (59)
-
-	.  reduce 59
-
-
-state 87
-	cond : expr comparador . expr  (56)
-	cond : expr comparador . error  (57)
-
-	error  shift 96
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
-	.  error
-
-	expr  goto 97
-	term  goto 59
-	fact  goto 60
-
-
-state 88
-	if : IF pcond $$3 THEN . bloqsent $$4 else  (36)
-	sentencia : .  (33)
-
-	BEGIN  shift 20
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 25
-	$end  reduce 33
-	ELSE  reduce 33
-	UNTIL  reduce 33
-	';'  reduce 33
-
-	bloqsent  goto 98
-	sentencia  goto 27
-	if  goto 28
-
-
-state 89
-	sentencia : LOOP $$2 bloqsent UNTIL . cond  (25)
-
-	ID  shift 55
-	CONST  shift 56
-	'-'  shift 57
-	.  error
-
-	cond  goto 99
-	expr  goto 65
-	term  goto 59
-	fact  goto 60
-
-
-state 90
-	fact : ID '(' error .  (51)
-
-	.  reduce 51
-
-
-state 91
-	fact : ID '(' ')' .  (50)
-
-	.  reduce 50
-
-
-state 92
-	expr : expr '+' term .  (42)
-	term : term . '*' fact  (45)
-	term : term . '/' fact  (46)
-
-	'*'  shift 76
-	'/'  shift 77
+	'*'  shift 77
+	'/'  shift 78
 	$end  reduce 42
 	error  reduce 42
 	ELSE  reduce 42
@@ -1002,13 +687,317 @@ state 92
 	'>'  reduce 42
 
 
-state 93
-	expr : expr '-' term .  (43)
-	term : term . '*' fact  (45)
-	term : term . '/' fact  (46)
+state 56
+	term : fact .  (45)
 
-	'*'  shift 76
-	'/'  shift 77
+	.  reduce 45
+
+
+state 57
+	sentencia : PRINT '(' error .  (32)
+
+	.  reduce 32
+
+
+state 58
+	sentencia : PRINT '(' STR . ')'  (28)
+
+	')'  shift 79
+	.  error
+
+
+state 59
+	pcond : '(' error .  (55)
+
+	.  reduce 55
+
+
+state 60
+	pcond : '(' cond . ')'  (53)
+	pcond : '(' cond . error  (54)
+
+	error  shift 80
+	')'  shift 81
+	.  error
+
+
+state 61
+	expr : expr . '+' term  (43)
+	expr : expr . '-' term  (44)
+	cond : expr . comparador expr  (57)
+	cond : expr . comparador error  (58)
+
+	EQU  shift 82
+	NEQ  shift 83
+	GEQ  shift 84
+	LEQ  shift 85
+	'+'  shift 75
+	'-'  shift 76
+	'<'  shift 86
+	'>'  shift 87
+	.  error
+
+	comparador  goto 88
+
+
+state 62
+	if : IF pcond error .  (38)
+
+	.  reduce 38
+
+
+state 63
+	if : IF pcond $$4 . THEN bloqsent $$5 else  (37)
+
+	THEN  shift 89
+	.  error
+
+
+state 64
+	sentencia : LOOP $$3 bloqsent . UNTIL cond  (26)
+
+	UNTIL  shift 90
+	.  error
+
+
+state 65
+	sentencia : ID '=' expr .  (29)
+	expr : expr . '+' term  (43)
+	expr : expr . '-' term  (44)
+
+	'+'  shift 75
+	'-'  shift 76
+	$end  reduce 29
+	ELSE  reduce 29
+	UNTIL  reduce 29
+	';'  reduce 29
+
+
+state 66
+	listdeclvar : declvar ';' listdeclvar .  (12)
+
+	.  reduce 12
+
+
+state 67
+	funcsent : ID ':' .  (17)
+
+	.  reduce 17
+
+
+state 68
+	decl : FUNCTION BEGIN $$2 listdeclvar funcsentlist END .  (8)
+
+	.  reduce 8
+
+
+state 69
+	funcsentlist : funcsent funcsentlist .  (14)
+
+	.  reduce 14
+
+
+state 70
+	funcsent : sentencia ';' .  (16)
+
+	.  reduce 16
+
+
+state 71
+	listsent : sentencia ';' listsent .  (22)
+
+	.  reduce 22
+
+
+state 72
+	fact : ID '(' . ')'  (51)
+	fact : ID '(' . error  (52)
+
+	error  shift 91
+	')'  shift 92
+	.  error
+
+
+state 73
+	fact : '-' CONST .  (50)
+
+	.  reduce 50
+
+
+state 74
+	sentencia : RETURN '(' expr ')' .  (27)
+
+	.  reduce 27
+
+
+state 75
+	expr : expr '+' . term  (43)
+
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	term  goto 93
+	fact  goto 56
+
+
+state 76
+	expr : expr '-' . term  (44)
+
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	term  goto 94
+	fact  goto 56
+
+
+state 77
+	term : term '*' . fact  (46)
+
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	fact  goto 95
+
+
+state 78
+	term : term '/' . fact  (47)
+
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	fact  goto 96
+
+
+state 79
+	sentencia : PRINT '(' STR ')' .  (28)
+
+	.  reduce 28
+
+
+state 80
+	pcond : '(' cond error .  (54)
+
+	.  reduce 54
+
+
+state 81
+	pcond : '(' cond ')' .  (53)
+
+	.  reduce 53
+
+
+state 82
+	comparador : EQU .  (64)
+
+	.  reduce 64
+
+
+state 83
+	comparador : NEQ .  (63)
+
+	.  reduce 63
+
+
+state 84
+	comparador : GEQ .  (62)
+
+	.  reduce 62
+
+
+state 85
+	comparador : LEQ .  (61)
+
+	.  reduce 61
+
+
+state 86
+	comparador : '<' .  (59)
+
+	.  reduce 59
+
+
+state 87
+	comparador : '>' .  (60)
+
+	.  reduce 60
+
+
+state 88
+	cond : expr comparador . expr  (57)
+	cond : expr comparador . error  (58)
+
+	error  shift 97
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	expr  goto 98
+	term  goto 55
+	fact  goto 56
+
+
+state 89
+	if : IF pcond $$4 THEN . bloqsent $$5 else  (37)
+	sentencia : .  (34)
+
+	BEGIN  shift 19
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 24
+	$end  reduce 34
+	ELSE  reduce 34
+	UNTIL  reduce 34
+	';'  reduce 34
+
+	bloqsent  goto 99
+	sentencia  goto 26
+	if  goto 27
+
+
+state 90
+	sentencia : LOOP $$3 bloqsent UNTIL . cond  (26)
+
+	ID  shift 51
+	CONST  shift 52
+	'-'  shift 53
+	.  error
+
+	cond  goto 100
+	expr  goto 61
+	term  goto 55
+	fact  goto 56
+
+
+state 91
+	fact : ID '(' error .  (52)
+
+	.  reduce 52
+
+
+state 92
+	fact : ID '(' ')' .  (51)
+
+	.  reduce 51
+
+
+state 93
+	expr : expr '+' term .  (43)
+	term : term . '*' fact  (46)
+	term : term . '/' fact  (47)
+
+	'*'  shift 77
+	'/'  shift 78
 	$end  reduce 43
 	error  reduce 43
 	ELSE  reduce 43
@@ -1026,109 +1015,132 @@ state 93
 
 
 state 94
-	term : term '*' fact .  (45)
+	expr : expr '-' term .  (44)
+	term : term . '*' fact  (46)
+	term : term . '/' fact  (47)
 
-	.  reduce 45
+	'*'  shift 77
+	'/'  shift 78
+	$end  reduce 44
+	error  reduce 44
+	ELSE  reduce 44
+	UNTIL  reduce 44
+	EQU  reduce 44
+	NEQ  reduce 44
+	GEQ  reduce 44
+	LEQ  reduce 44
+	';'  reduce 44
+	')'  reduce 44
+	'+'  reduce 44
+	'-'  reduce 44
+	'<'  reduce 44
+	'>'  reduce 44
 
 
 state 95
-	term : term '/' fact .  (46)
+	term : term '*' fact .  (46)
 
 	.  reduce 46
 
 
 state 96
-	cond : expr comparador error .  (57)
+	term : term '/' fact .  (47)
 
-	.  reduce 57
+	.  reduce 47
 
 
 state 97
-	expr : expr . '+' term  (42)
-	expr : expr . '-' term  (43)
-	cond : expr comparador expr .  (56)
+	cond : expr comparador error .  (58)
 
-	'+'  shift 74
-	'-'  shift 75
-	$end  reduce 56
-	error  reduce 56
-	ELSE  reduce 56
-	UNTIL  reduce 56
-	';'  reduce 56
-	')'  reduce 56
+	.  reduce 58
 
 
 state 98
-	if : IF pcond $$3 THEN bloqsent . $$4 else  (36)
-	$$4 : .  (35)
+	expr : expr . '+' term  (43)
+	expr : expr . '-' term  (44)
+	cond : expr comparador expr .  (57)
 
-	.  reduce 35
-
-	$$4  goto 100
+	'+'  shift 75
+	'-'  shift 76
+	$end  reduce 57
+	error  reduce 57
+	ELSE  reduce 57
+	UNTIL  reduce 57
+	';'  reduce 57
+	')'  reduce 57
 
 
 state 99
-	sentencia : LOOP $$2 bloqsent UNTIL cond .  (25)
-
-	.  reduce 25
-
-
-100: shift/reduce conflict (shift 101, reduce 40) on ELSE
-state 100
-	if : IF pcond $$3 THEN bloqsent $$4 . else  (36)
-	else : .  (40)
-
-	ELSE  shift 101
-	$end  reduce 40
-	UNTIL  reduce 40
-	';'  reduce 40
-
-	else  goto 102
-
-
-state 101
-	else : ELSE . $$5 bloqsent  (39)
-	$$5 : .  (38)
-
-	.  reduce 38
-
-	$$5  goto 103
-
-
-state 102
-	if : IF pcond $$3 THEN bloqsent $$4 else .  (36)
+	if : IF pcond $$4 THEN bloqsent . $$5 else  (37)
+	$$5 : .  (36)
 
 	.  reduce 36
 
-
-state 103
-	else : ELSE $$5 . bloqsent  (39)
-	sentencia : .  (33)
-
-	BEGIN  shift 20
-	RETURN  shift 21
-	PRINT  shift 22
-	IF  shift 23
-	LOOP  shift 24
-	ID  shift 25
-	$end  reduce 33
-	ELSE  reduce 33
-	UNTIL  reduce 33
-	';'  reduce 33
-
-	bloqsent  goto 104
-	sentencia  goto 27
-	if  goto 28
+	$$5  goto 101
 
 
-state 104
-	else : ELSE $$5 bloqsent .  (39)
+state 100
+	sentencia : LOOP $$3 bloqsent UNTIL cond .  (26)
+
+	.  reduce 26
+
+
+101: shift/reduce conflict (shift 102, reduce 41) on ELSE
+state 101
+	if : IF pcond $$4 THEN bloqsent $$5 . else  (37)
+	else : .  (41)
+
+	ELSE  shift 102
+	$end  reduce 41
+	UNTIL  reduce 41
+	';'  reduce 41
+
+	else  goto 103
+
+
+state 102
+	else : ELSE . $$6 bloqsent  (40)
+	$$6 : .  (39)
 
 	.  reduce 39
 
+	$$6  goto 104
 
-State 100 contains 1 shift/reduce conflict.
+
+state 103
+	if : IF pcond $$4 THEN bloqsent $$5 else .  (37)
+
+	.  reduce 37
 
 
-32 terminals, 25 nonterminals
-64 grammar rules, 105 states
+state 104
+	else : ELSE $$6 . bloqsent  (40)
+	sentencia : .  (34)
+
+	BEGIN  shift 19
+	RETURN  shift 20
+	PRINT  shift 21
+	IF  shift 22
+	LOOP  shift 23
+	ID  shift 24
+	$end  reduce 34
+	ELSE  reduce 34
+	UNTIL  reduce 34
+	';'  reduce 34
+
+	bloqsent  goto 105
+	sentencia  goto 26
+	if  goto 27
+
+
+state 105
+	else : ELSE $$6 bloqsent .  (40)
+
+	.  reduce 40
+
+
+State 101 contains 1 shift/reduce conflict.
+
+
+32 terminals, 26 nonterminals
+65 grammar rules, 106 states

@@ -7,6 +7,7 @@ parser::parser(lexer_base * lex, stream_base * err, codegen_base * cod, SymbolTa
     this->cod = cod;
     this->sym = sym;
     this->error = false;
+    this->ambito = 0;
 }
 
 bool parser::hasErrors()
@@ -53,21 +54,47 @@ int parser::negative(int i)
     sym->insert(vstr, nattr);
     return sym->getIndex(vstr);
 }
-/*
-int parser::scope(int i)
+
+void parser::fIn()
 {
+    function = true;
+    ambito++;
+}
+
+void parser::fOut()
+{
+    function = false;
+}
+
+int parser::decl(int i)
+{
+    if(!sym->contains(i)) return -1;
+
     Attribute * attr = this->sym->value(i);
-
-    QString vstr = "S_"+attr->lexema;
-    if(sym->contains(vstr))
-        return sym->getIndex(vstr);
-
-    Attribute * nattr = new Attribute();
-    nattr->lexema = vstr;
-    nattr->type = attr->type;
-    sym->insert(vstr, nattr);
-    return sym->getIndex(vstr);
-}*/
+    if(function)
+    {
+        int ret = attr->ambito.value(ambito, -1);
+        if(ret < 0 && attr->type == "long") ret = i;
+        return ret;
+    }
+    else
+        return i;
+}
+bool parser::setType(int i, QString type)
+{
+    if(type != "long" || !function) return sym->setType(i,type);
+    if(function)
+    {
+        Attribute * attr = this->sym->value(i);
+        if(attr->ambito.contains(ambito)) return false;
+        Attribute * nattr = new Attribute();
+        nattr->lexema = "_foo"+QString::number(ambito)+"_"+attr->lexema;
+        nattr->type = type;
+        sym->insert(nattr->lexema, nattr);
+        attr->ambito.insert(ambito, sym->getIndex(nattr->lexema));
+    }
+    return true;
+}
 
 #define yyparse parser::yyparse
 #include "Y_TAB.C" // yypase()

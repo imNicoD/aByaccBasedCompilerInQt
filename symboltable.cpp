@@ -29,12 +29,16 @@ bool SymbolTable::contains(QString s)
     return this->attr.contains(s);
 }
 
+bool SymbolTable::contains(int key)
+{
+    return key < this->attr.size();
+}
+
 
 int SymbolTable::getIndex(QString s)
 {
     return this->index.indexOf(s);
 }
-
 
 int SymbolTable::size()
 {

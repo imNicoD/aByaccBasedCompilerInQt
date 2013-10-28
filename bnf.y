@@ -1,5 +1,5 @@
 %token FUNCTION BEGIN END RETURN PRINT IF THEN ELSE LOOP UNTIL ID CONST TYPE STR EQU NEQ GEQ LEQ
-%right THEN ELSE
+%right ELSE
 
 %%
 
@@ -13,7 +13,8 @@ listdecl	: decl ';' listdecl							{ $$ = cod->node(CODE_DECLLIST, $1,$3);}
 			;
 			
 decl		: declvar
-			| FUNCTION BEGIN listdeclvar funcsentlist END { $$ = cod->node(CODE_FUNCTION, $3, $4); }
+			| FUNCTION BEGIN 							{ fIn(); }
+				listdeclvar funcsentlist END 			{ $$ = cod->node(CODE_FUNCTION, $3, $4); fOut(); }
 			| FUNCTION error							{ notify("Se esperaba BEGIN."); yyclearin;}
 			;
 
@@ -34,8 +35,8 @@ funcsent 	: sentencia  ';' 							{ $$ = $1; }
 			;	
 
 
-listvar		: ID 										{ if(sym->setType($1,"long")) $$ = $1; else notify("Identificador redeclarado.");}
-			| ID ',' listvar							{ if(sym->setType($1,"long")) $$ = cod->node(CODE_VARLIST, $1, $3); else notify("Identificador redeclarado.");}
+listvar		: ID 										{ if(setType($1,"long")) $$ = $1; else notify("Identificador redeclarado.");}
+			| ID ',' listvar							{ if(setType($1,"long")) $$ = cod->node(CODE_VARLIST, $1, $3); else notify("Identificador redeclarado.");}
 			;
 
 bloqsent	: BEGIN listsent END						{ $$ = $2; }
@@ -51,7 +52,7 @@ sentencia 	: if										{ $$ = $1;}
 				bloqsent UNTIL cond 					{cod->push(KIND_JUMPC, TO_BW); $$ = cod->node(CODE_LOOP, $2 ,$4 );}
 			| RETURN '(' expr ')'						{cod->push(KIND_RET); $$ = cod->node(CODE_RETURN, $3);}
 			| PRINT '(' STR ')'							{cod->push(KIND_SYMBOL, $3); cod->push(KIND_PRINT); $$ = cod->node(CODE_PRINT, $3);}
-			| ID '=' expr								{cod->push(KIND_SYMBOL, $1); cod->push(KIND_OPERATOR, '='); $$ = cod->node(CODE_ASIG, $1, $3);}
+			| ID '=' expr								{if(($1 = decl($1)) >= 0) cod->push(KIND_SYMBOL, $1); else notify("Variable no declarada long."); cod->push(KIND_OPERATOR, '='); $$ = cod->node(CODE_ASIG, $1, $3);}
 			| ID error									{ $$ = cod->node(CODE_VOID); notify("Se esperaba '='."); yyclearin;}
 			| RETURN error								{$$ = cod->node(CODE_VOID); notify("se esperaba '('"); yyclearin;}
 			| PRINT '(' error							{$$ = cod->node(CODE_VOID); notify("se esperaba '\"'"); yyclearin;}
@@ -80,7 +81,7 @@ term 		: fact								{ $$ = $1; }
 			|  term '/' fact					{ cod->push(KIND_OPERATOR, '/');$$  =cod->node('/', $1, $3);}
 			;
 		
-fact		: ID								{ cod->push(KIND_SYMBOL, $1); }
+fact		: ID								{ if(($1 = decl($1)) >= 0) cod->push(KIND_SYMBOL, $1); else notify("Variable no declarada long."); }
 			| CONST								{if(!check_range($$)) notify("Variable fuera de rango"); else cod->push(KIND_SYMBOL, $1);}
 			| '-' CONST							{$$ = negative($2); cod->push(KIND_SYMBOL, $$);}
 			| ID '(' ')'						{cod->push(KIND_SYMBOL, $1);cod->push(KIND_CALL, 0);$$ = cod->node(CODE_CALL, $1);}

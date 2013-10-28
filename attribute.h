@@ -1,6 +1,6 @@
 #ifndef ATTRIBUTE_H
 #define ATTRIBUTE_H
-
+#include <QMap>
 #include <QString>
 
 class Attribute
@@ -11,6 +11,7 @@ public:
     QString type;
     long long value;
     QString lexema;
+    QMap<int,int> ambito;
 };
 
 #endif // ATTRIBUTE_H

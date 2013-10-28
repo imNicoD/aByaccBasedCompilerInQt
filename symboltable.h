@@ -12,6 +12,7 @@ public:
     bool setType(const int i, const QString type);
     void insert(QString s, Attribute * attr);
     bool contains(QString s);
+    bool contains(int key);
     int getIndex(QString s);
     int size();
     QList<QString> keys();
