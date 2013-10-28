@@ -26,6 +26,7 @@ static char yysccsid[] = "@(#)yaccpar	1.9 (Berkeley) 02/21/93";
 #define NEQ 272
 #define GEQ 273
 #define LEQ 274
+#define noelse 275
 #define YYERRCODE 256
 short yylhs[] = {                                        -1,
     3,    0,    1,    1,    1,    4,    7,    4,    4,    5,
@@ -169,7 +170,7 @@ short yycheck[] = {                                      43,
 #ifndef YYDEBUG
 #define YYDEBUG 0
 #endif
-#define YYMAXTOKEN 274
+#define YYMAXTOKEN 275
 #if YYDEBUG
 char *yyname[] = {
 "end-of-file",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -180,7 +181,7 @@ char *yyname[] = {
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,"FUNCTION","BEGIN","END","RETURN","PRINT","IF","THEN","ELSE",
-"LOOP","UNTIL","ID","CONST","TYPE","STR","EQU","NEQ","GEQ","LEQ",
+"LOOP","UNTIL","ID","CONST","TYPE","STR","EQU","NEQ","GEQ","LEQ","noelse",
 };
 char *yyrule[] = {
 "$accept : program",
@@ -416,254 +417,254 @@ yyreduce:
     switch (yyn)
     {
 case 1:
-#line 6 "bnf.y"
+#line 5 "bnf.y"
 {cod->push(KIND_LABEL,TO_BW);}
 break;
 case 2:
-#line 7 "bnf.y"
+#line 6 "bnf.y"
 {yyval = cod->node(CODE_PROGRAM, yyvsp[-2],yyvsp[-1]);}
 break;
 case 3:
-#line 10 "bnf.y"
+#line 9 "bnf.y"
 { yyval = cod->node(CODE_DECLLIST, yyvsp[-2],yyvsp[0]);}
 break;
 case 4:
-#line 11 "bnf.y"
+#line 10 "bnf.y"
 { yyval = yyvsp[-1]; }
 break;
 case 5:
-#line 12 "bnf.y"
+#line 11 "bnf.y"
 { yyval = cod->node(CODE_VOID);}
 break;
 case 7:
-#line 16 "bnf.y"
+#line 15 "bnf.y"
 { fIn(); }
 break;
 case 8:
-#line 17 "bnf.y"
+#line 16 "bnf.y"
 { yyval = cod->node(CODE_FUNCTION, yyvsp[-3], yyvsp[-2]); fOut(); }
 break;
 case 9:
-#line 18 "bnf.y"
+#line 17 "bnf.y"
 { notify("Se esperaba BEGIN."); yyclearin;}
 break;
 case 10:
-#line 21 "bnf.y"
+#line 20 "bnf.y"
 { yyval = cod->node(CODE_DECL, yyvsp[-1], yyvsp[0]);}
 break;
 case 11:
-#line 22 "bnf.y"
+#line 21 "bnf.y"
 { notify("Se esperaba identificador."); yyclearin;}
 break;
 case 12:
-#line 25 "bnf.y"
+#line 24 "bnf.y"
 { yyval = cod->node(CODE_DECLLIST, yyvsp[-2],yyvsp[0]);}
 break;
 case 13:
-#line 26 "bnf.y"
+#line 25 "bnf.y"
 { yyval = cod->node(CODE_VOID);}
 break;
 case 14:
-#line 29 "bnf.y"
+#line 28 "bnf.y"
 { yyval = cod->node(CODE_BLOCK, yyvsp[-1], yyvsp[0]); }
 break;
 case 15:
-#line 30 "bnf.y"
+#line 29 "bnf.y"
 { yyval = cod->node(CODE_VOID);}
 break;
 case 16:
-#line 33 "bnf.y"
+#line 32 "bnf.y"
 { yyval = yyvsp[-1]; }
 break;
 case 17:
-#line 34 "bnf.y"
+#line 33 "bnf.y"
 { if(sym->setType(yyvsp[-1],"entry")){ cod->push(KIND_ENTRY, yyvsp[-1]);yyval = cod->node(CODE_ENTRY, yyvsp[-1]);} else notify("Identificador redeclarado.");;}
 break;
 case 18:
-#line 38 "bnf.y"
+#line 37 "bnf.y"
 { if(setType(yyvsp[0],"long")) yyval = yyvsp[0]; else notify("Identificador redeclarado.");}
 break;
 case 19:
-#line 39 "bnf.y"
+#line 38 "bnf.y"
 { if(setType(yyvsp[-2],"long")) yyval = cod->node(CODE_VARLIST, yyvsp[-2], yyvsp[0]); else notify("Identificador redeclarado.");}
 break;
 case 20:
-#line 42 "bnf.y"
+#line 41 "bnf.y"
 { yyval = yyvsp[-1]; }
 break;
 case 21:
-#line 43 "bnf.y"
+#line 42 "bnf.y"
 { yyval = yyvsp[0]; }
 break;
 case 22:
-#line 46 "bnf.y"
+#line 45 "bnf.y"
 { yyval = cod->node(CODE_BLOCK, yyvsp[-2], yyvsp[0]); }
 break;
 case 23:
-#line 47 "bnf.y"
+#line 46 "bnf.y"
 { yyval = cod->node(CODE_VOID);}
 break;
 case 24:
-#line 50 "bnf.y"
+#line 49 "bnf.y"
 { yyval = yyvsp[0];}
 break;
 case 25:
-#line 51 "bnf.y"
+#line 50 "bnf.y"
 {cod->push(KIND_LABEL, TO_FW);}
 break;
 case 26:
-#line 52 "bnf.y"
+#line 51 "bnf.y"
 {cod->push(KIND_JUMPC, TO_BW); yyval = cod->node(CODE_LOOP, yyvsp[-3] ,yyvsp[-1] );}
 break;
 case 27:
-#line 53 "bnf.y"
+#line 52 "bnf.y"
 {cod->push(KIND_RET); yyval = cod->node(CODE_RETURN, yyvsp[-1]);}
 break;
 case 28:
-#line 54 "bnf.y"
+#line 53 "bnf.y"
 {cod->push(KIND_SYMBOL, yyvsp[-1]); cod->push(KIND_PRINT); yyval = cod->node(CODE_PRINT, yyvsp[-1]);}
 break;
 case 29:
-#line 55 "bnf.y"
+#line 54 "bnf.y"
 {if((yyvsp[-2] = decl(yyvsp[-2])) >= 0) cod->push(KIND_SYMBOL, yyvsp[-2]); else notify("Variable no declarada long."); cod->push(KIND_OPERATOR, '='); yyval = cod->node(CODE_ASIG, yyvsp[-2], yyvsp[0]);}
 break;
 case 30:
-#line 56 "bnf.y"
+#line 55 "bnf.y"
 { yyval = cod->node(CODE_VOID); notify("Se esperaba '='."); yyclearin;}
 break;
 case 31:
-#line 57 "bnf.y"
+#line 56 "bnf.y"
 {yyval = cod->node(CODE_VOID); notify("se esperaba '('"); yyclearin;}
 break;
 case 32:
-#line 58 "bnf.y"
+#line 57 "bnf.y"
 {yyval = cod->node(CODE_VOID); notify("se esperaba '\"'"); yyclearin;}
 break;
 case 33:
-#line 59 "bnf.y"
+#line 58 "bnf.y"
 {yyval = cod->node(CODE_VOID); notify("se esperaba '('"); yyclearin;}
 break;
 case 35:
-#line 63 "bnf.y"
+#line 62 "bnf.y"
 { cod->push(KIND_JUMPC, TO_FW); }
 break;
 case 36:
-#line 64 "bnf.y"
+#line 63 "bnf.y"
 {yyval = cod->node(CODE_IF_ELSE, yyvsp[-3], yyvsp[-1], yyvsp[0]);}
 break;
 case 37:
-#line 65 "bnf.y"
+#line 64 "bnf.y"
 {cod->push(KIND_LABEL, TO_BW);}
 break;
 case 38:
-#line 66 "bnf.y"
+#line 65 "bnf.y"
 {yyval = cod->node(CODE_VOID); notify("se esperaba THEN"); yyclearin;}
 break;
 case 39:
-#line 69 "bnf.y"
+#line 68 "bnf.y"
 {cod->push(KIND_JUMP, TO_FW),cod->push(KIND_LABEL, TO_BBW); }
 break;
 case 40:
-#line 70 "bnf.y"
+#line 69 "bnf.y"
 {yyval = yyvsp[-1];}
 break;
 case 41:
-#line 71 "bnf.y"
+#line 70 "bnf.y"
 {yyval = cod->node(CODE_VOID); }
 break;
 case 42:
-#line 74 "bnf.y"
+#line 73 "bnf.y"
 { yyval = yyvsp[0]; }
 break;
 case 43:
-#line 75 "bnf.y"
+#line 74 "bnf.y"
 { cod->push(KIND_OPERATOR, '+'); yyval = cod->node('+', yyvsp[-2], yyvsp[0]);}
 break;
 case 44:
-#line 76 "bnf.y"
+#line 75 "bnf.y"
 { cod->push(KIND_OPERATOR, '-'); yyval = cod->node('-', yyvsp[-2], yyvsp[0]);}
 break;
 case 45:
-#line 79 "bnf.y"
+#line 78 "bnf.y"
 { yyval = yyvsp[0]; }
 break;
 case 46:
-#line 80 "bnf.y"
+#line 79 "bnf.y"
 { cod->push(KIND_OPERATOR, '*');yyval = cod->node('*', yyvsp[-2], yyvsp[0]);}
 break;
 case 47:
-#line 81 "bnf.y"
+#line 80 "bnf.y"
 { cod->push(KIND_OPERATOR, '/');yyval  =cod->node('/', yyvsp[-2], yyvsp[0]);}
 break;
 case 48:
-#line 84 "bnf.y"
+#line 83 "bnf.y"
 { if((yyvsp[0] = decl(yyvsp[0])) >= 0) cod->push(KIND_SYMBOL, yyvsp[0]); else notify("Variable no declarada long."); }
 break;
 case 49:
-#line 85 "bnf.y"
+#line 84 "bnf.y"
 {if(!check_range(yyval)) notify("Variable fuera de rango"); else cod->push(KIND_SYMBOL, yyvsp[0]);}
 break;
 case 50:
-#line 86 "bnf.y"
+#line 85 "bnf.y"
 {yyval = negative(yyvsp[0]); cod->push(KIND_SYMBOL, yyval);}
 break;
 case 51:
-#line 87 "bnf.y"
+#line 86 "bnf.y"
 {cod->push(KIND_SYMBOL, yyvsp[-2]);cod->push(KIND_CALL, 0);yyval = cod->node(CODE_CALL, yyvsp[-2]);}
 break;
 case 52:
-#line 88 "bnf.y"
+#line 87 "bnf.y"
 {yyval = cod->node(CODE_VOID); notify("se esperaba ')'"); yyclearin;}
 break;
 case 53:
-#line 91 "bnf.y"
+#line 90 "bnf.y"
 {yyval = yyvsp[-1]; }
 break;
 case 54:
-#line 92 "bnf.y"
+#line 91 "bnf.y"
 { yyval = cod->node(CODE_VOID); notify("Se esperaba ')'"); yyclearin;}
 break;
 case 55:
-#line 93 "bnf.y"
+#line 92 "bnf.y"
 { yyval = cod->node(CODE_VOID); notify("Se esperaba condición."); yyclearin;}
 break;
 case 56:
-#line 94 "bnf.y"
+#line 93 "bnf.y"
 { yyval = cod->node(CODE_VOID); notify("Se esperaba '('"); yyclearin;}
 break;
 case 57:
-#line 98 "bnf.y"
+#line 97 "bnf.y"
 { cod->push(KIND_OPERATOR, yyvsp[-1]); yyval = cod->node(yyvsp[-1], yyvsp[-2], yyvsp[0]);}
 break;
 case 58:
-#line 99 "bnf.y"
+#line 98 "bnf.y"
 { yyval = cod->node(CODE_VOID); notify("Se esperaba expreción"); yyclearin;}
 break;
 case 59:
-#line 102 "bnf.y"
+#line 101 "bnf.y"
 {yyval =  '<';}
 break;
 case 60:
-#line 103 "bnf.y"
+#line 102 "bnf.y"
 {yyval =  '>';}
 break;
 case 61:
-#line 104 "bnf.y"
+#line 103 "bnf.y"
 {yyval =  LEQ;}
 break;
 case 62:
-#line 105 "bnf.y"
+#line 104 "bnf.y"
 {yyval =  GEQ;}
 break;
 case 63:
-#line 106 "bnf.y"
+#line 105 "bnf.y"
 {yyval =  NEQ;}
 break;
 case 64:
-#line 107 "bnf.y"
+#line 106 "bnf.y"
 {yyval =  EQU;}
 break;
-#line 667 "y_tab.c"
+#line 668 "y_tab.c"
     }
     yyssp -= yym;
     yystate = *yyssp;

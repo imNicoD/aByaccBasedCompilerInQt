@@ -1085,7 +1085,6 @@ state 100
 	.  reduce 26
 
 
-101: shift/reduce conflict (shift 102, reduce 41) on ELSE
 state 101
 	if : IF pcond $$4 THEN bloqsent $$5 . else  (37)
 	else : .  (41)
@@ -1139,8 +1138,5 @@ state 105
 	.  reduce 40
 
 
-State 101 contains 1 shift/reduce conflict.
-
-
-32 terminals, 26 nonterminals
+33 terminals, 26 nonterminals
 65 grammar rules, 106 states

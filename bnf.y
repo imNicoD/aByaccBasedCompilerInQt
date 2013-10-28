@@ -1,6 +1,5 @@
 %token FUNCTION BEGIN END RETURN PRINT IF THEN ELSE LOOP UNTIL ID CONST TYPE STR EQU NEQ GEQ LEQ
-%right ELSE
-
+%right ELSE noelse
 %%
 
 program		: listdecl 									{cod->push(KIND_LABEL,TO_BW);} 
@@ -68,7 +67,7 @@ if			: IF pcond 									{ cod->push(KIND_JUMPC, TO_FW); }
 
 else		: ELSE 										{cod->push(KIND_JUMP, TO_FW),cod->push(KIND_LABEL, TO_BBW); }
 				bloqsent								{$$ = $2;}
-			|											{$$ = cod->node(CODE_VOID); }
+			| %prec noelse								{$$ = cod->node(CODE_VOID); }
 			;
 
 expr		: term 								{ $$ = $1; }
