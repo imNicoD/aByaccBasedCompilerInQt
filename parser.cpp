@@ -6,6 +6,12 @@ parser::parser(lexer_base * lex, stream_base * err, codegen_base * cod, SymbolTa
     this->err = err;
     this->cod = cod;
     this->sym = sym;
+    this->error = false;
+}
+
+bool parser::hasErrors()
+{
+    return error;
 }
 
 void parser::yyerror(QString s)
@@ -18,6 +24,7 @@ void parser::yyerror(QString s)
 void parser::notify(const char *c)
 {
     this->err->putLine("PARSER ERROR "+QString::number(lex->currentLine())+": "+QString(c));
+    error = true;
 }
 
 int parser::yylex()

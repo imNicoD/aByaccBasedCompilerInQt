@@ -48,9 +48,12 @@ void codegen_revpolish::push(int kind, int val)
         {
             int i = (val == TO_BW)?1:2;
             int j = labelStack.value(labelStack.size()-i);
-            labelStack.remove(labelStack.size()-i);
-            V.remove(j);
-            V.insert(j, {KIND_ADDR,V.size()+1});
+            if(!labelStack.empty())
+            {
+                labelStack.remove(labelStack.size()-i);
+                V.remove(j);
+                V.insert(j, {KIND_ADDR,V.size()+1});
+            }
         }
     }
     else if(kind == KIND_JUMP || kind == KIND_JUMPC)

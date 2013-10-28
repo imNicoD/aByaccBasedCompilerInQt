@@ -9,12 +9,7 @@ asmgen::asmgen(SymbolTable *sym, stream_base *out)
     this->sym = sym;
     this->out = out;
     v.append(54391);
-    cmp.insert('<',"JGE");
-    cmp.insert(LEQ,"JG");
-    cmp.insert(EQU,"JNE");
-    cmp.insert(NEQ,"JE");
-    cmp.insert('>',"JLE");
-    cmp.insert(GEQ,"JL");
+
 }
 
 void asmgen::data_out()
@@ -59,6 +54,16 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
     data_out();
     out->putLine(".CODE");
     out->putLine("start:");
+
+
+    QMap<int, QString> cmp; // jump on fail
+    cmp.insert('<',"JGE");
+    cmp.insert(LEQ,"JG");
+    cmp.insert(EQU,"JNE");
+    cmp.insert(NEQ,"JE");
+    cmp.insert('>',"JLE");
+    cmp.insert(GEQ,"JL");
+
     for(int i = 0; i < rev_polish->size(); i++)
     {
         r=0;
@@ -72,20 +77,19 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             A = v.last();
             v.removeLast();
             out->putLine("\tSUB ESP, 4");
-            out->putLine("\tPUSH EAX");
-            out->putLine("\tPUSH EBX");
-            out->putLine("\tPUSH ECX");
-            out->putLine("\tPUSH EDX");
+            out->putLine("\tPUSH EBP");
+            out->putLine("\tMOV EBP,ESP");
+            for(int RR = 0; RR < 4; RR++) if(used[RR]) out->putLine("\tPUSH "+reg[RR]);
             out->putLine("\tCALL _"+sym->value(A)->lexema);
-            out->putLine("\tPOP EDX");
-            out->putLine("\tPOP ECX");
-            out->putLine("\tPOP EBX");
-            out->putLine("\tPOP EAX");
+            for(int RR = 3; RR >= 0; RR--) if(used[RR]) out->putLine("\tPOP "+reg[RR]);
+            out->putLine("\tPOP EBP");
             while(r<4&&used[r]) r++;
             out->putLine("\tPOP "+reg[r]);
+            used[r] = v.size();
+            v.push_back(-r-1);
             break;
         case KIND_ENTRY:
-            out->putLine("_"+sym->value(i)->lexema+":");
+            out->putLine("_"+sym->value(n.val)->lexema+":");
             break;
         case KIND_JUMP:
             A = v.last();
@@ -114,23 +118,25 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             switch (n.val) {
             case '=':
                 if(B<0) // se copia de registro
+                {
                     out->putLine("\tmov "+As+","+Bs);
+                }
                 else // se copia memoria a memoria
                 {
-                    out->putLine("\tmov EAX,"+Bs);
-                    out->putLine("\tmov "+As+",EAX");
+                    out->putLine(QString("\tmov EAX,")+Bs);
+                    out->putLine(QString("\tmov ")+As+",EAX");
                 }
                 break;
             case '+':
                 if(A<0) // si A en registro
                 {
-                    out->putLine("\tadd "+As+","+Bs);
+                    out->putLine(QString("\tadd ")+As+","+Bs);
                     used[-A-1] = v.size();
                     v.push_back(A);
                 }
                 else if(B<0) // si B en registro
                 {
-                    out->putLine("\tadd "+Bs+","+As);
+                    out->putLine(QString("\tadd ")+Bs+","+As);
                     used[-B-1] = v.size();
                     v.push_back(B);
                 }
@@ -139,34 +145,33 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                     while(r<4&&used[r]) r++;
                     out->putLine("\tmov "+reg[r]+","+As);
                     out->putLine("\tadd "+reg[r]+","+Bs);
-                    used[-r-1] = v.size();
+                    used[r] = v.size();
                     v.push_back(-r-1);
                 }
                 out->putLine("\tJO ADDOV_ERROR");
                 break;
             case '-':
-                if(A<0) // si A en registro
+                if(B<0) // si A en registro
                 {
-                    out->putLine("\tSUB "+As+","+Bs);
-                    used[-A-1] = v.size();
-                    v.push_back(A);
-                }
-                else if(B<0) // si B en registro
-                {
-                    out->putLine("\tNEG "+Bs);
-                    out->putLine("\tADD "+As+","+Bs);
+                    out->putLine("\tSUB "+Bs+","+As);
                     used[-B-1] = v.size();
                     v.push_back(B);
+                }
+                else if(A<0) // si B en registro
+                {
+                    out->putLine("\tNEG "+As);
+                    out->putLine("\tADD "+Bs+","+As);
+                    used[-A-1] = v.size();
+                    v.push_back(A);
                 }
                 else // todos en memoria
                 {
                     while(r<4&&used[r]) r++;
-                    out->putLine("\tmov "+reg[r]+","+As);
-                    out->putLine("\tSUB "+reg[r]+","+Bs);
-                    used[-r-1] = v.size();
+                    out->putLine("\tmov "+reg[r]+","+Bs);
+                    out->putLine("\tSUB "+reg[r]+","+As);
+                    used[r] = v.size();
                     v.push_back(-r-1);
                 }
-                out->putLine("\tJO ADDOV_ERROR");
                 break;
             case '*':
                 if(A<0&&B!=-3) // si A en Reg
@@ -183,7 +188,7 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                     }
                     if(used[3])
                     {
-                        while(r<2&&used[0])r++;
+                        while(r<2&&used[r])r++;
                         if(r<2)
                         {
                             if(B==-r-1)
@@ -208,18 +213,20 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                 else if(B<0) // si B en Reg
                 {
                     if(B!=-3)
-                    {
-                        out->putLine("\tXOR EAX,"+Bs);
-                        out->putLine("\tXOR "+Bs+",EAX");
-                        out->putLine("\tXOR EAX,"+Bs);
-                        used[-B-1] = used[2];
-                        used[2] = 0;
-                        v.remove(used[-B-1]);
-                        v.insert(used[-B-1],-B-1);
-                    }
+                        if(used[2])
+                        {
+                            out->putLine("\tXOR EAX,"+Bs);
+                            out->putLine("\tXOR "+Bs+",EAX");
+                            out->putLine("\tXOR EAX,"+Bs);
+                            used[-B-1] = used[2];
+                            used[2] = 0;
+                            v.remove(used[-B-1]);
+                            v.insert(used[-B-1],-B-1);
+                        }else
+                            out->putLine("\tMOV EAX,"+Bs);
                     if(used[3])
                     {
-                        while(r<2&&used[0])r++;
+                        while(r<2&&used[r])r++;
                         if(r<2)
                         {
                             if(A==-r-1)
@@ -245,21 +252,21 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                 {
                     if(used[2])
                     {
-                        while(r<2&&used[0])r++;
+                        while(r<2&&used[r])r++;
                         if(r<2)
                         {
                            out->putLine("\tMOV "+reg[r]+","+reg[2]);
                             used[r] = used[2];
                             used[2] = 0;
                             v.remove(used[r]);
-                            v.insert(used[r],-r-2);
+                            v.insert(used[r],-r-1);
                         }
                         else
                             qDebug() << "* regs overflow!!!";
                     }r=0;
                     if(used[3])
                     {
-                        while(r<2&&used[0])r++;
+                        while(r<2&&used[r])r++;
                         if(r<2)
                         {
                            out->putLine("\tMOV "+reg[r]+","+reg[3]);
@@ -279,6 +286,84 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                 out->putLine("\tJO MULOV_ERROR");
                 break;
             case '/':
+                if(B<0) // si B en Reg
+                {
+                    if(B!=-3)
+                        if(used[2])
+                        {
+                            out->putLine("\tXOR EAX,"+Bs);
+                            out->putLine("\tXOR "+Bs+",EAX");
+                            out->putLine("\tXOR EAX,"+Bs);
+                            used[-B-1] = used[2];
+                            used[2] = 0;
+                            v.remove(used[-B-1]);
+                            v.insert(used[-B-1],-B-1);
+                        }else
+                            out->putLine("\tMOV EAX,"+Bs);
+                    if(used[3])
+                    {
+                        while(r<2&&used[r])r++;
+                        if(r<2)
+                        {
+                            if(A==-r-1)
+                            {//swap
+                                out->putLine("\tXOR "+reg[r]+","+reg[3]);
+                                out->putLine("\tXOR "+reg[3]+","+reg[r]);
+                                out->putLine("\tXOR "+reg[r]+","+reg[3]);
+                                As = reg[3];
+                            }
+                            else
+                                out->putLine("\tMOV "+reg[r]+","+reg[3]);
+                            used[r] = used[3];
+                            used[3] = 0;
+                            v.remove(used[r]);
+                            v.insert(used[r],-r-3);
+                        }
+                        else
+                            qDebug() << "* regs overflow!!!";
+                    }
+                    out->putLine("\tIDIV "+As);
+                }
+                else // B en memoria
+                {
+                    if(used[2])
+                    {
+                        while(r<2&&used[r])r++;
+                        if(r<2)
+                        {
+                           out->putLine("\tMOV "+reg[r]+","+reg[2]);
+                            used[r] = used[2];
+                            used[2] = 0;
+                            v.remove(used[r]);
+                            v.insert(used[r],-r-1);
+                        }
+                        else
+                            qDebug() << "* regs overflow!!!";
+                    } r=0;
+                    if(used[3])
+                    {
+                        while(r<2&&used[r])r++;
+                        if(r<2)
+                        {
+                           out->putLine("\tMOV "+reg[r]+","+reg[3]);
+                            used[r] = used[3];
+                            used[3] = 0;
+                            v.remove(used[r]);
+                            v.insert(used[r],-r-3);
+                        }
+                        else
+                            qDebug() << "* regs overflow!!!";
+                    }
+                    if(A == -3) // As == EAX => As := EDX
+                    {
+                        out->putLine("\tMOV "+reg[3]+","+As);
+                        As = reg[3];
+                    }
+                    out->putLine("\tMOV EAX,"+Bs);
+                    out->putLine("\tIDIV "+As);
+                }
+                used[2] = v.size();
+                v.push_back(-2-1);
                 break;
             case '<':
             case '>':
@@ -308,8 +393,7 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             v.removeLast();
             if(A<0){ As = reg[-A-1]; used[-A-1] = 0;}
             else    As = "_"+sym->value(A)->lexema;
-            out->putLine("\tMOV [ebp+20],"+As);
-            out->putLine("\tPOP ebp");
+            out->putLine("\tMOV [ebp+4],"+As);
             out->putLine("\tRET");
         default:
             break;
@@ -324,5 +408,5 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
     out->putLine(QString("\tinvoke MessageBox, NULL, addr MULOV, addr MULOV, MB_OK"));
     out->putLine("finally:");
     out->putLine("invoke ExitProcess, 0");
-    out->putLine(" ");
+    out->putLine("end start");
 }

@@ -164,6 +164,7 @@ void MainWindow::on_actionBuild_triggered()
 
     //Para la salida a Texto
     stream_txt txt("Result.txt");
+    stream_txt codAsm("cod.asm");
     stream_double out(this, &txt);
     codegen_revpolish code;
     parser p1(lexer, &out, &code, symTable);
@@ -174,8 +175,12 @@ void MainWindow::on_actionBuild_triggered()
         Attribute* aux = symTable->value(names.at(i));
         txt.putLine(names.at(i) +QString(" ")+ aux->type);
     }
-    asmgen gen(symTable, new console());
-    gen.generate(code.getRP());
+    code.dump();
+    if(!(p1.hasErrors()))
+    {
+        asmgen gen(symTable, &codAsm);
+        gen.generate(code.getRP());
+    }
 }
 
 //Muestra en la Status Bar la linea en la que estoy

@@ -316,7 +316,7 @@ int Lexer::yylex()
             state=0;
     }
     if(state == F){
-        err->putLine(actualLexema + ", token identificado: " + QString::number(token));
+        //err->putLine(actualLexema + ", token identificado: " + QString::number(token));
         return token;
     }
     else{
