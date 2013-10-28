@@ -393,7 +393,13 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             v.removeLast();
             if(A<0){ As = reg[-A-1]; used[-A-1] = 0;}
             else    As = "_"+sym->value(A)->lexema;
-            out->putLine("\tMOV [ebp+4],"+As);
+            if(A < 0)
+                out->putLine("\tMOV [ebp+4],"+As);
+            else
+            {
+                out->putLine("\tMOV EAX,"+As);
+                out->putLine("\tMOV [ebp+4],EAX");
+            }
             out->putLine("\tRET");
         default:
             break;
