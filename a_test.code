@@ -1,0 +1,32 @@
+long a;
+
+function
+begin
+	long b;
+	 b = 2;
+	loop
+		b = b * b
+	until b > 30;
+	return(b);
+end;
+
+function
+begin
+	a = 2;
+
+foo:
+	a = 3;
+	return (3+5);
+ff:
+return (55*1);
+end;
+long b;
+begin
+ a = foo() * 2;
+b  =999;
+loop
+b = b-1
+until b < a;
+b = b +1; 
+if (b == 3*2+5*2) then print("Funciona?!") else print("wololo");
+end
