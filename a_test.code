@@ -3,6 +3,7 @@ long a;
 function
 begin
 	long b;
+powpow:
 	 b = 2;
 	loop
 		b = b * b
@@ -23,7 +24,9 @@ end;
 long b;
 begin
  a = foo() * 2;
-b  =999;
+
+if(32 == powpow() ) then print("powpow = 32") else print("powpow != 32");
+b = 999;
 loop
 b = b-1
 until b < a;
