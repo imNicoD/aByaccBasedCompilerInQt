@@ -80,6 +80,8 @@ int parser::decl(int i)
     else
         return i;
 }
+#include <QDebug>
+
 bool parser::setType(int i, QString type)
 {
     if(type != "long" || !function) return sym->setType(i,type);

@@ -12,7 +12,7 @@ codegen_revpolish::codegen_revpolish()
 
 
 
-int codegen_revpolish::node(int type, ...)
+int codegen_revpolish::node(int type, ...) // Deprecated
 {/*
     if(type == CODE_VOID) return -1;
     va_list ap;
@@ -62,7 +62,7 @@ void codegen_revpolish::push(int kind, int val)
         {
             int j = labelStack.last();
             V.push_back({KIND_ADDR, j});
-            labelStack.removeLast();
+            labelStack.pop_back();
         }
         else
         {

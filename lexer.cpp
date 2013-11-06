@@ -3,6 +3,7 @@
 
 Lexer::Lexer(QString text, stream_base * err, SymbolTable * symTable)
 {
+    fail = false;
     this->err = err;
     readingInfo = text; // copy the text on the screen
     reservedWordTable = new QMap<QString, int>();
@@ -330,6 +331,10 @@ SymbolTable *Lexer::getSybolTable()
     return symbolTable;
 }
 
+bool Lexer::hasErrors()
+{
+    return fail;
+}
 
 
 /**   SEMANTIC ACTIONS   **/

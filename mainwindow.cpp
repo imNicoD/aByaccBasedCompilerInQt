@@ -146,7 +146,7 @@ void MainWindow::documentWasModified()
 {
     modified=1;
 }
-
+/************************************* Build ************************/
 #include "parser.h"
 #include "console.h"
 #include "codegen_tree.h"
@@ -155,6 +155,7 @@ void MainWindow::documentWasModified()
 #include "stream_double.h"
 #include "stream_txt.h"
 #include "asmgen.h"
+#include "revpolish_tostring.h"
 
 void MainWindow::on_actionBuild_triggered()
 {
@@ -175,8 +176,9 @@ void MainWindow::on_actionBuild_triggered()
         Attribute* aux = symTable->value(names.at(i));
         txt.putLine(names.at(i) +QString(" ")+ aux->type);
     }
-    code.dump();
-    if(!(p1.hasErrors()))
+    new revpolish_tostring(code.getRP(),symTable,&txt);
+    //code.dump();
+    if(!(p1.hasErrors() || lexer->hasErrors()))
     {
         asmgen gen(symTable, &codAsm);
         gen.generate(code.getRP());

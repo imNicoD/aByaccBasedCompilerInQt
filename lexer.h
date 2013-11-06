@@ -68,6 +68,8 @@ public:
     //Show Symbol Table
     SymbolTable * getSybolTable();
 
+    virtual bool hasErrors();
+
 private:
     //Elements for reading the text
     int         actualLine;
@@ -77,7 +79,7 @@ private:
     QChar        actualChar;
     int         lastEntry;
     int         token;
-
+    bool        fail;
     stream_base * err;
 
     //Returns the type of the character given as parameter

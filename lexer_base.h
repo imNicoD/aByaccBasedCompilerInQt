@@ -7,6 +7,7 @@ public:
     virtual int yylex() = 0;
     virtual int currentLine() = 0;
     virtual int currentCol() = 0;
+    virtual bool hasErrors() = 0;
 };
 
 #endif // LEXER_BASE_H

@@ -58,11 +58,11 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
 
     QMap<int, QString> cmp; // jump on fail
     cmp.insert('<',"JGE");
-    cmp.insert(LEQ,"JG");
+    cmp.insert(LEQ,"JG" );
     cmp.insert(EQU,"JNE");
-    cmp.insert(NEQ,"JE");
+    cmp.insert(NEQ,"JE" );
     cmp.insert('>',"JLE");
-    cmp.insert(GEQ,"JL");
+    cmp.insert(GEQ,"JL" );
 
     for(int i = 0; i < rev_polish->size(); i++)
     {
@@ -75,7 +75,7 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             break;
         case KIND_CALL:
             A = v.last();
-            v.removeLast();
+            v.pop_back();
             out->putLine("\tSUB ESP, 4");
             out->putLine("\tPUSH EBP");
             out->putLine("\tMOV EBP,ESP");
@@ -93,14 +93,14 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             break;
         case KIND_JUMP:
             A = v.last();
-            v.removeLast();
+            v.pop_back();
             out->putLine("\tJMP LABEL_"+QString::number(A));
             break;
         case KIND_JUMPC:
             A = v.last();
-            v.removeLast();
+            v.pop_back();
             B = v.last();
-            v.removeLast();
+            v.pop_back();
             out->putLine("\t"+cmp.value(B)+" LABEL_"+QString::number(A));
             break;
         case KIND_LABEL:
@@ -108,9 +108,9 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             break;
         case KIND_OPERATOR:
             A = v.last();
-            v.removeLast();
+            v.pop_back();
             B = v.last();
-            v.removeLast();
+            v.pop_back();
             if(A<0){ As = reg[-A-1]; used[-A-1] = 0;}
             else    As = "_"+sym->value(A)->lexema;
             if(B<0){ Bs = reg[-B-1]; used[-B-1] = 0;}
@@ -213,6 +213,7 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                 else if(B<0) // si B en Reg
                 {
                     if(B!=-3)
+                    {
                         if(used[2])
                         {
                             out->putLine("\tXOR EAX,"+Bs);
@@ -224,6 +225,7 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                             v.insert(used[-B-1],-B-1);
                         }else
                             out->putLine("\tMOV EAX,"+Bs);
+                    }
                     if(used[3])
                     {
                         while(r<2&&used[r])r++;
@@ -289,6 +291,7 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                 if(B<0) // si B en Reg
                 {
                     if(B!=-3)
+                    {
                         if(used[2])
                         {
                             out->putLine("\tXOR EAX,"+Bs);
@@ -300,6 +303,7 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
                             v.insert(used[-B-1],-B-1);
                         }else
                             out->putLine("\tMOV EAX,"+Bs);
+                    }
                     if(used[3])
                     {
                         while(r<2&&used[r])r++;
@@ -385,12 +389,12 @@ void asmgen::generate(QVector<rp_node_t> * rev_polish)
             break;
         case KIND_PRINT:
             A = v.last();
-            v.removeLast();
+            v.pop_back();
             out->putLine(QString()+"\tinvoke MessageBox, NULL, addr "+"STR"+QString::number(A)+", addr "+"STR"+QString::number(A)+", MB_OK");
             break;
         case KIND_RET:
             A = v.last();
-            v.removeLast();
+            v.pop_back();
             if(A<0){ As = reg[-A-1]; used[-A-1] = 0;}
             else    As = "_"+sym->value(A)->lexema;
             if(A < 0)
